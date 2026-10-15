@@ -9,11 +9,15 @@ import Sidebar from './components/Sidebar/Sidebar'
 
 
 function Layout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  }
 
   return (
     <div className="flex antialised bg-surface text-copy min-h-screen">
-      <Sidebar isOpen={isSidebarOpen} />
+      <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar}/>
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         
@@ -27,8 +31,6 @@ function Layout() {
 }
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <BrowserRouter>
       <Routes>
