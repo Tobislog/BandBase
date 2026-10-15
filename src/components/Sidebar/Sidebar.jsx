@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Home, ListMusic, MessageCircle } from "lucide-react";
 
 function Sidebar () {
 
@@ -8,15 +9,15 @@ function Sidebar () {
                 BandBase
             </div>
             <nav>
-                <div>
-                    Bereich 1
-                </div>
-                <div>
-                    Bereich 2
-                </div>
-                <div>
-                    Bereich 3
-                </div>
+                <a href="/">
+                    <Home />
+                </a>
+                <a href="/setlist">
+                    <ListMusic />
+                </a>
+                <a href="/setlist">
+                    <MessageCircle />
+                </a>
             </nav>
         </aside>
     )

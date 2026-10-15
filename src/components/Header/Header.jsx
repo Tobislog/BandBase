@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Menu, Music2 } from "lucide-react";
 
-function Header () {
+export default function Header () {
     return (
-        <header>
+        <header className=" h-12 flex-none flex flex-row">
             <button type="button">
                 <Menu className="w-6 h-6 hover:text-brand cursor-pointer"/>
             </button>
-            <a href="/">
+            <a href="/" className="flex flex-row">
                 <span>
-                    <Music2 className="w-6 h-6 hover:text-brand cursor-pointer"/>
+                    <Music2 className="w-6 h-6 bg-brand cursor-pointer"/>
                 </span>
                 <span className="">
                     BandBase
@@ -18,5 +18,3 @@ function Header () {
         </header>
     )
 }
-
-export default Header
