@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Setlist from './pages/Setlist';
 import Header from './components/Header/Header'
 import Sidebar from './components/Sidebar/Sidebar'
+import { NAV_ITEMS } from './config/navigation';
 
 
 function Layout() {
@@ -35,6 +36,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
+          {NAV_ITEMS.map((item) => (
+            <Route 
+              key={item.path}
+              path={item.path === '/' ? undefined : item.path}
+              index={item.path === '/'}
+              element={item.component}
+            />
+          ))}
           <Route index element={<Home />} />
           <Route path="setlist" element={<Setlist />} />
         </Route>

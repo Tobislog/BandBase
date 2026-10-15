@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import { Home, ListMusic, MessageCircle, Menu } from "lucide-react";
-
 import SidebarLink from "../SidebarLink/SidebarLink";
+import { NAV_ITEMS } from "../../config/navigation";
 
 function Sidebar ( { isOpen, onToggle }) {
 
@@ -17,9 +16,18 @@ function Sidebar ( { isOpen, onToggle }) {
                 {isOpen && <span>BandBase</span>}
             </div>
             <nav className="flex flex-col gap-4 p-4">
-                <SidebarLink to="/" icon={<Home />} text="Home" isOpen={isOpen} />
-                <SidebarLink to="/setlist" icon={<ListMusic />} text="Setlist" isOpen={isOpen}/>
-                <SidebarLink to="/setlist" icon={<MessageCircle />} text="Messages" isOpen={isOpen}/>
+                {/* Go through NAV_ITEMS and generate SidebarLink-Items */}
+                {NAV_ITEMS.map((item) => (
+                    <SidebarLink
+                        key={item.path}
+                        to={item.path}
+                        icon={item.icon}
+                        text={item.name}
+                        isOpen={isOpen}
+                    />
+                ))
+
+                }
             </nav>
         </aside>
     )
