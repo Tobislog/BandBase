@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { ListMusic, Plus } from "lucide-react"
+import { ListMusic, Library, Plus } from "lucide-react"
 import { getStoredSetlists, saveStoredSetlists } from '../services/storageService'
+
+import BasicTile from "../components/BasicTile/BasicTile";
 
 export default function Setlist () {
     const [setlists, setSetLists] = useState([]);
@@ -40,15 +42,7 @@ export default function Setlist () {
                 {/* Setlist Section */}
                 <section className="flex flex-col gap-4">
 
-                    <div className="rounded-xl border border-line bg-surface-accent">
-                        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
-                                <ListMusic className="h-4 w-4" />
-                                Setlists
-                            </h2>
-                        </div>
-                        {/* Setlists-list */}
-                        <div className="flex items-center justify-between px-4 py-3">
+                    <BasicTile title="Setlists" icon={<ListMusic />}>
                             <div className="flex flex-row items-center gap-2 ">
                                 {setlists.map((setlist) => (
                                     <div key={setlist.id} className="p-2 rounded border border-line-accent hover:bg-surface hover:border-none" >
@@ -65,17 +59,19 @@ export default function Setlist () {
                                 <Plus className="h-4 w-4"/>
                                 New Setlist
                             </button>
-                        </div>
-                    </div>
+                    </BasicTile>
 
-                    <div>
-                        Weiteres Modul
-                    </div>         
+                    <BasicTile>
+                        <div>
+                            Hallo
+                        </div>
+                    </BasicTile>        
                 </section>
                 {/* Songs Section */}
                 <section>
-                    <div>
-                    </div>
+                    <BasicTile title="Song-Arcive" icon={<Library />}>
+                        und ich steh dann im Body des Moduls
+                    </BasicTile>
                 </section>
             </div>
         </div>
