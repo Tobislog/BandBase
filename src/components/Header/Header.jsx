@@ -17,7 +17,7 @@ function Header () {
                         <path d="M12 18V2l7 4"/>
                     </svg>
                 </span>
-                <span>
+                <span className="bg-white text-base">
                     BandBase
                 </span>
             </a>
