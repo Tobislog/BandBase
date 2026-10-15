@@ -19,6 +19,7 @@ export default function Setlist () {
         const newSetlist = {
             id: Date.now().toString(),
             name: 'Neue Setlist',
+            stageTime: '20:00',
             songs: []
         };
 
@@ -37,16 +38,25 @@ export default function Setlist () {
         setSetLists(updatedSetlists);
         saveStoredSetlists(updatedSetlists);
 
-        if (updatedSetlists.length === 0) setActiveSetlist(null);
+        setActiveSetlist(null);
     }
 
-    const handleSetlistNameChange = (newName) => {
+    const handleInputChange = (e) => {
         if (!activeSetlist) return;
+        const {name, value } = e.target
 
-        const updatedActive = {...activeSetlist, name: newName};
-        setActiveSetlist(updatedActive);
+        const updatedActiveSetlist = {
+            ...activeSetlist,
+            [name]: value
+        };
+        setActiveSetlist(updatedActiveSetlist);
 
-        const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActive : setlist);
+        setActiveSetlist(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActiveSetlist : setlist);
 
         setSetLists(updatedSetlists);
 
@@ -71,7 +81,7 @@ export default function Setlist () {
                     {/* Setlist-List */}
                     <BasicTile title="Setlists" icon={<ListMusic />}>
                             <div className="flex items-center justify-between px-4 py-3">
-                                <div className="flex flex-row items-center gap-2 ">
+                                <div className="flex flex-row flex-wrap items-center gap-2 ">
                                     {setlists.map((setlist) => (
                                         <div 
                                             key={setlist.id} 
@@ -101,12 +111,19 @@ export default function Setlist () {
                                 <input 
                                     type="text" 
                                     value={activeSetlist.name}
-                                    onChange={(e) => handleSetlistNameChange(e.target.value)}
+                                    name = "name"
+                                    onChange={handleInputChange}
                                     className="rounded-md border border-line px-3 test-sm h-10"  
                                 />
                                 <div>
                                     <span className="text-xs font-medium">Stagetime</span>
-                                    <input type="time" className="rounded-md border border-line text-sm h-8 px-2 w-24"/>
+                                    <input 
+                                        type="time"
+                                        name="stageTime"
+                                        value={activeSetlist.stageTime || ''}
+                                        onChange={handleInputChange}
+                                        className="rounded-md border border-line text-sm h-8 px-2 w-24"
+                                    />
                                 </div>
                                 <div className="ml-auto flex items-center gap-1.5">
                                     <BasicButton title="Export to PDF" icon={<Download />} />
