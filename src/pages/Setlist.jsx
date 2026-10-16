@@ -27,7 +27,7 @@ export default function Setlist () {
     // handler Setlist
     const handleCreateNewSetlist = () => {
         const newSetlist = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             name: 'Neue Setlist',
             stageTime: '20:00',
             songs: []
@@ -73,7 +73,7 @@ export default function Setlist () {
     // handler Songs
     const handleCreateNewSong = () => {
         const newSong = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             name: 'New Song',
             length: 0
         }
@@ -92,16 +92,37 @@ export default function Setlist () {
 
     const handleAddSongToSetlist = (songId) => {
         if (!activeSetlist) return;
+
+        const newSetlistEntry = {
+            rowId: crypto.randomUUID(),
+            songId: songId
+        };
+
         const updatedActiveSetlist = {
             ...activeSetlist,
-            songs: [...(activeSetlist.songs || []), songId]
+            songs: [...(activeSetlist.songs || []), newSetlistEntry]
         };
         setActiveSetlist(updatedActiveSetlist);
+
         const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActiveSetlist : setlist);
         setSetLists(updatedSetlists);
         saveStoredSetlists(updatedSetlists);
     }
     
+    const handleDeleteSongFromSetlist = (rowId) => {
+        if (!activeSetlist) return;
+        const updatedActiveSetlist = {
+            ...activeSetlist,
+            songs: activeSetlist.songs.filter(item => item.rowId !== rowId)
+        };
+        setActiveSetlist(updatedActiveSetlist);
+        const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActiveSetlist : setlist);
+        setSetLists(updatedSetlists);
+        saveStoredSetlists(updatedSetlists);
+
+
+    }
+
     return (
         <div>
             {/* Page-Heading */}
@@ -126,6 +147,7 @@ export default function Setlist () {
                         activeSetlist={activeSetlist}
                         songs={songs}
                         onInputChange={handleInputChange}
+                        onDeleteSong={handleDeleteSongFromSetlist}
                         onDelete={handleDeleteActiveSetlist}
                     />      
                 </section>

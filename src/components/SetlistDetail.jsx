@@ -3,7 +3,7 @@ import { Trash, Form, Notebook, Coffee, Download } from "lucide-react";
 import BasicTile from "./BasicTile";
 import BasicButton from "./BasicButton";
 
-export default function SetlistDetail ({ activeSetlist, songs, onInputChange, onDelete}) {
+export default function SetlistDetail ({ activeSetlist, songs, onInputChange, onDeleteSong, onDelete}) {
 
     return (
         <BasicTile>
@@ -41,9 +41,18 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
-                    {activeSetlist.songs.map((id) => (
-                        <div>{songs.find((e) => e.id === id).name}</div>
-                    ))}
+                    {(activeSetlist.songs.length > 0) ? (
+                        activeSetlist.songs.map((entry) => (
+                        <div key={entry.rowId} className="flex flex-row items-center justify-between rounded bg-surface gap-2 p-2">
+                            <div>{songs.find((e) => e.id === entry.songId).name}</div>
+                            <BasicButton icon={<Trash />} isDelete onClick={() => onDeleteSong(entry.rowId)}/>
+                        </div>
+                        ))
+                    ) : (
+                        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-4 text-center">
+                            Keine Songs vorhanden
+                        </div>
+                    )}
                 </div>
             </div>
             ) : (
