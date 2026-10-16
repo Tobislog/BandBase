@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { NAV_ITEMS } from "../../config/navigation";
+import { NAV_ITEMS } from "../config/navigation";
 
 export default function Header () {
     const location = useLocation();

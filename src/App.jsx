@@ -4,8 +4,8 @@ import './App.css'
 
 import Home from './pages/Home';
 import Setlist from './pages/Setlist';
-import Header from './components/Header/Header'
-import Sidebar from './components/Sidebar/Sidebar'
+import Header from './components/Header'
+import Sidebar from './components/Sidebar'
 import { NAV_ITEMS } from './config/navigation';
 
 

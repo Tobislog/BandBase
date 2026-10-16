@@ -1,7 +1,7 @@
 import React from "react";
 import { Home, ListMusic, MessageCircle, Menu } from "lucide-react";
-import SidebarLink from "../SidebarLink/SidebarLink";
-import { NAV_ITEMS } from "../../config/navigation";
+import SidebarLink from "./SidebarLink";
+import { NAV_ITEMS } from "../config/navigation";
 
 function Sidebar ( { isOpen, onToggle }) {
 

@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react"
-import { Form, ListMusic, Library, Plus, Trash, Coffee, Notebook, Download } from "lucide-react"
-import { getStoredSetlists, saveStoredSetlists } from '../services/storageService'
+import { Form, ListMusic, Library, Plus, Trash, Coffee, Notebook, Download, Pen } from "lucide-react"
+import { getStoredSetlists, saveStoredSetlists , getStoredSongs, saveStoredSongs } from '../services/storageService'
 
-import BasicTile from "../components/BasicTile/BasicTile";
-import BasicButton from "../components/BasicButton/BasicButton";
+import BasicTile from "../components/BasicTile";
+import BasicButton from "../components/BasicButton";
 
 export default function Setlist () {
     const [setlists, setSetLists] = useState([]);
     const [activeSetlist, setActiveSetlist] = useState(null);
 
+    const [songs, setSongs] = useState([]);
+
+
+
     // Initial Page-Load: Load Data from Localstorage
     useEffect(() => {
         const loadedSetlists = getStoredSetlists();
         setSetLists(loadedSetlists);
+    }, []);
+
+    useEffect(() => {
+        const loadedSongs = getStoredSongs();
+        setSongs(loadedSongs);
     }, []);
 
     const handleCreateNewSetlist = () => {
@@ -61,6 +70,25 @@ export default function Setlist () {
         setSetLists(updatedSetlists);
 
         saveStoredSetlists(updatedSetlists);
+    }
+
+    const handleCreateNewSong = () => {
+        const newSong = {
+            id: Date.now().toString(),
+            name: 'New Song',
+            length: 0
+        }
+
+        const updatedSongList = [...songs, newSong];
+        setSongs(updatedSongList);
+        saveStoredSongs(updatedSongList);
+    }
+    
+    const handleDeleteSong = (songId) => {
+        const updatedSongList = songs.filter(s => s.id !== songId);
+        setSongs(updatedSongList);
+        saveStoredSongs(updatedSongList);
+
     }
 
 
@@ -152,7 +180,26 @@ export default function Setlist () {
                 {/* Songs Section */}
                 <section>
                     <BasicTile title="Song-Arcive" icon={<Library />}>
-                        Song-Arcive
+                        <div className="flex justify-end border-b border-line p-2 h-12">
+                            <BasicButton title="Add Song" icon={<Plus />} onClick={() => handleCreateNewSong()} />
+                        </div>
+                        <div>
+                            {songs.map((song) => (
+                                <div 
+                                    key={song.id}
+                                    className="flex items-center justify-between p-2 m-2 bg-surface rounded border border-line"
+                                >
+                                    <div>
+                                        {song.name}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <BasicButton icon={<Plus />}/>
+                                        <BasicButton icon={<Pen />}/>
+                                        <BasicButton icon={<Trash />} onClick={() => handleDeleteSong(song.id)}/>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </BasicTile>
                 </section>
             </div>
