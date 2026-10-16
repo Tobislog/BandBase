@@ -3,7 +3,7 @@ import { Trash, Form, Notebook, Coffee, Download } from "lucide-react";
 import BasicTile from "./BasicTile";
 import BasicButton from "./BasicButton";
 
-export default function SetlistDetail ({ activeSetlist, onInputChange, onDelete}) {
+export default function SetlistDetail ({ activeSetlist, songs, onInputChange, onDelete}) {
 
     return (
         <BasicTile>
@@ -41,7 +41,9 @@ export default function SetlistDetail ({ activeSetlist, onInputChange, onDelete}
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
-                    Song-Bereich
+                    {activeSetlist.songs.map((id) => (
+                        <div>{songs.find((e) => e.id === id).name}</div>
+                    ))}
                 </div>
             </div>
             ) : (

@@ -3,7 +3,7 @@ import { Library, Plus, Pen, Trash } from "lucide-react";
 import BasicButton from "./BasicButton";
 import BasicTile from "./BasicTile";
 
-export default function SongLibrary ({ songs, onCreateSong, onDeleteSong}) {
+export default function SongLibrary ({ songs, onCreateSong, onAddSong, onDeleteSong}) {
     return (
         <BasicTile title="Song-Arcive" icon={<Library />}>
             <div className="flex justify-end border-b border-line p-2 h-12">
@@ -19,7 +19,7 @@ export default function SongLibrary ({ songs, onCreateSong, onDeleteSong}) {
                             {song.name}
                         </div>
                         <div className="flex gap-2">
-                            <BasicButton icon={<Plus />}/>
+                            <BasicButton icon={<Plus />} onClick={() => onAddSong(song.id)}/>
                             <BasicButton icon={<Pen />}/>
                             <BasicButton icon={<Trash />} isDelete onClick={() => onDeleteSong(song.id)}/>
                         </div>

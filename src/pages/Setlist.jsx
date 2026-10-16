@@ -14,19 +14,17 @@ export default function Setlist () {
 
     const [songs, setSongs] = useState([]);
 
-
-
     // Initial Page-Load: Load Data from Localstorage
     useEffect(() => {
         const loadedSetlists = getStoredSetlists();
         setSetLists(loadedSetlists);
     }, []);
-
     useEffect(() => {
         const loadedSongs = getStoredSongs();
         setSongs(loadedSongs);
     }, []);
 
+    // handler Setlist
     const handleCreateNewSetlist = () => {
         const newSetlist = {
             id: Date.now().toString(),
@@ -37,7 +35,6 @@ export default function Setlist () {
 
         const updatedSetlists = [...setlists, newSetlist];
         setSetLists(updatedSetlists);
-
         saveStoredSetlists(updatedSetlists);
     }
 
@@ -69,12 +66,11 @@ export default function Setlist () {
         }));
 
         const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActiveSetlist : setlist);
-
         setSetLists(updatedSetlists);
-
         saveStoredSetlists(updatedSetlists);
     }
 
+    // handler Songs
     const handleCreateNewSong = () => {
         const newSong = {
             id: Date.now().toString(),
@@ -94,8 +90,18 @@ export default function Setlist () {
 
     }
 
-
-
+    const handleAddSongToSetlist = (songId) => {
+        if (!activeSetlist) return;
+        const updatedActiveSetlist = {
+            ...activeSetlist,
+            songs: [...(activeSetlist.songs || []), songId]
+        };
+        setActiveSetlist(updatedActiveSetlist);
+        const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActiveSetlist : setlist);
+        setSetLists(updatedSetlists);
+        saveStoredSetlists(updatedSetlists);
+    }
+    
     return (
         <div>
             {/* Page-Heading */}
@@ -118,6 +124,7 @@ export default function Setlist () {
                     {/* Setlist-Details */}
                     <SetlistDetail 
                         activeSetlist={activeSetlist}
+                        songs={songs}
                         onInputChange={handleInputChange}
                         onDelete={handleDeleteActiveSetlist}
                     />      
@@ -127,6 +134,7 @@ export default function Setlist () {
                     <SongLibrary 
                         songs={songs} 
                         onCreateSong={handleCreateNewSong}
+                        onAddSong={handleAddSongToSetlist}
                         onDeleteSong={handleDeleteSong}    
                     />
                 </section>
