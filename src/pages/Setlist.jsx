@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, act } from "react"
 import { Form, ListMusic, Library, Plus, Trash, Coffee, Notebook, Download, Pen } from "lucide-react"
 import { getStoredSetlists, saveStoredSetlists , getStoredSongs, saveStoredSongs } from '../services/storageService'
 
 import BasicTile from "../components/BasicTile";
 import BasicButton from "../components/BasicButton";
+import SongLibrary from "../components/SongLibrary";
+import SetlistSelector from "../components/SetlistSelector";
+import SetlistDetail from "../components/SetlistDetail";
 
 export default function Setlist () {
     const [setlists, setSetLists] = useState([]);
@@ -106,101 +109,26 @@ export default function Setlist () {
             <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
                 {/* Setlist Section */}
                 <section className="flex flex-col gap-4">
-                    {/* Setlist-List */}
-                    <BasicTile title="Setlists" icon={<ListMusic />}>
-                            <div className="flex items-center justify-between px-4 py-3">
-                                <div className="flex flex-row flex-wrap items-center gap-2 ">
-                                    {setlists.map((setlist) => (
-                                        <div 
-                                            key={setlist.id} 
-                                            onClick={() => handleSelectSetlist(setlist)} 
-                                            className={`p-2 rounded border border-line-accent hover:bg-surface hover:border-none ${activeSetlist?.id === setlist.id ? 'bg-line-accent' : ''}`}
-                                        >
-                                            <span className="text-sm ">{setlist.name}</span>
-                                            <span className="ml-1">({setlist.songs.length})</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            <button 
-                                type="button"
-                                onClick={handleCreateNewSetlist}
-                                className="inline-flex items-center rounded justify-between gap-2 hover:bg-surface h-8 px-3"
-                            >
-                                <Plus className="h-4 w-4"/>
-                                New Setlist
-                            </button>
-                        </div>
-                    </BasicTile>
+                    <SetlistSelector 
+                        setlists={setlists}
+                        activeSetlist={activeSetlist}
+                        onSelect={handleSelectSetlist}
+                        onCreate={handleCreateNewSetlist}
+                    />
                     {/* Setlist-Details */}
-                    <BasicTile>
-                        {activeSetlist ? (
-                        <div className="flex flex-col gap-4 p-4">
-                            <div className="flex flex-row flex-wrap items-center gap-1.5">
-                                <input 
-                                    type="text" 
-                                    value={activeSetlist.name}
-                                    name = "name"
-                                    onChange={handleInputChange}
-                                    className="rounded-md border border-line px-3 test-sm h-10"  
-                                />
-                                <div>
-                                    <span className="text-xs font-medium">Stagetime</span>
-                                    <input 
-                                        type="time"
-                                        name="stageTime"
-                                        value={activeSetlist.stageTime || ''}
-                                        onChange={handleInputChange}
-                                        className="rounded-md border border-line text-sm h-8 px-2 w-24"
-                                    />
-                                </div>
-                                <div className="ml-auto flex items-center gap-1.5">
-                                    <BasicButton title="Export to PDF" icon={<Download />} />
-                                    <BasicButton icon={<Trash />} onClick={() => handleDeleteActiveSetlist()}/>
-                                </div>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="inline-flex items-center gap-1 rounded-md text-xs">Gesamt 0 min</span>
-                                <div className="ml-auto inline-flex items-center gap-1.5">
-                                   <BasicButton title="Block" icon={<Form />} />
-                                   <BasicButton title="Note" icon={<Notebook />} />
-                                   <BasicButton title="Break" icon={<Coffee />} />
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
-                                Song-Bereich
-                            </div>
-                        </div>
-                        ) : (
-                        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
-                            Setlist auswählen
-                        </div>
-                        )}
-                    </BasicTile>        
+                    <SetlistDetail 
+                        activeSetlist={activeSetlist}
+                        onInputChange={handleInputChange}
+                        onDelete={handleDeleteActiveSetlist}
+                    />      
                 </section>
                 {/* Songs Section */}
                 <section>
-                    <BasicTile title="Song-Arcive" icon={<Library />}>
-                        <div className="flex justify-end border-b border-line p-2 h-12">
-                            <BasicButton title="Add Song" icon={<Plus />} onClick={() => handleCreateNewSong()} />
-                        </div>
-                        <div>
-                            {songs.map((song) => (
-                                <div 
-                                    key={song.id}
-                                    className="flex items-center justify-between p-2 m-2 bg-surface rounded border border-line"
-                                >
-                                    <div>
-                                        {song.name}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <BasicButton icon={<Plus />}/>
-                                        <BasicButton icon={<Pen />}/>
-                                        <BasicButton icon={<Trash />} onClick={() => handleDeleteSong(song.id)}/>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </BasicTile>
+                    <SongLibrary 
+                        songs={songs} 
+                        onCreateSong={handleCreateNewSong}
+                        onDeleteSong={handleDeleteSong}    
+                    />
                 </section>
             </div>
         </div>
