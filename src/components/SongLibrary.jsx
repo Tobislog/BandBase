@@ -4,7 +4,7 @@ import BasicButton from "./BasicButton";
 import BasicTile from "./BasicTile";
 import SongItem from "./SongItem";
 
-export default function SongLibrary ({ songs, onCreateSong, onAddSong, onDeleteSong}) {
+export default function SongLibrary ({ songs, onCreateSong, onAddSong, onEditSong, onDeleteSong}) {
     const [isSongdetailsVisible, setIsSongdetailsVisible] = useState(true);
 
     const handleShowSongDetais = () => {
@@ -22,6 +22,7 @@ export default function SongLibrary ({ songs, onCreateSong, onAddSong, onDeleteS
                         key={song.id}
                         song={song}
                         onAddSong={onAddSong}
+                        onEditSong={onEditSong}
                         onDeleteSong={onDeleteSong}
                     />
                 ))}

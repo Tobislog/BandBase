@@ -52,7 +52,7 @@ export default function Setlist () {
 
     const handleInputChange = (e) => {
         if (!activeSetlist) return;
-        const {name, value } = e.target
+        const {name, value } = e.target;
 
         const updatedActiveSetlist = {
             ...activeSetlist,
@@ -82,6 +82,12 @@ export default function Setlist () {
         setSongs(updatedSongList);
         saveStoredSongs(updatedSongList);
     }
+
+    const handleEditSong = (updatedSong) => {
+        const updatedSongList = songs.map(s => s.id === updatedSong.id ? updatedSong : s);
+        setSongs(updatedSongList);
+        saveStoredSongs(updatedSongList);
+    };
     
     const handleDeleteSong = (songId) => {
         const updatedSongList = songs.filter(s => s.id !== songId);
@@ -157,6 +163,7 @@ export default function Setlist () {
                         songs={songs} 
                         onCreateSong={handleCreateNewSong}
                         onAddSong={handleAddSongToSetlist}
+                        onEditSong={handleEditSong}
                         onDeleteSong={handleDeleteSong}    
                     />
                 </section>

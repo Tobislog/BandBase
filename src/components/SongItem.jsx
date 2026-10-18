@@ -1,15 +1,30 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import BasicButton from "./BasicButton";
 import { Plus, Trash, Pen } from "lucide-react";
 
-export default function SongItem ({song, onAddSong, onDeleteSong}) {
+import { getStoredSongs, saveStoredSongs } from '../services/storageService'
+
+export default function SongItem ({song, onAddSong, onEditSong, onDeleteSong}) {
     const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+
+    const handleInputChange = (e) => {
+        const updatedSong = {
+            ...song,
+            name: e.target.value
+        };
+        onEditSong(updatedSong);
+    }
 
     return (
         <div className="flex flex-col justify center p-2 m-2 bg-surface rounded border border-line" >
                         <div className="flex flex-row justify-between items-center">
-                            <p>{song.name}</p>
+                            <input 
+                                type="text" 
+                                value={song.name} 
+                                onChange={handleInputChange} 
+                                disabled={!isDetailsVisible}
+                                className="border-line rounded disabled:border-line" 
+                                />
                             <div className="flex gap-2">
                                 <BasicButton icon={<Plus />} onClick={() => onAddSong(song.id)} />
                                 <BasicButton icon={<Pen />} onClick={() => setIsDetailsVisible(!isDetailsVisible)} />
@@ -18,8 +33,8 @@ export default function SongItem ({song, onAddSong, onDeleteSong}) {
                         </div>
                         {isDetailsVisible && (
                             <div>
-                            hier?
-                        </div>
+                                hier?
+                            </div>
                         )}
                     </div>
     )
