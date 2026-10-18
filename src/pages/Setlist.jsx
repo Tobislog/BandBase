@@ -75,7 +75,9 @@ export default function Setlist () {
         const newSong = {
             id: crypto.randomUUID(),
             name: 'New Song',
-            length: 0
+            interpret: '',
+            duration: 0,
+            bpm: 0
         }
 
         const updatedSongList = [...songs, newSong];

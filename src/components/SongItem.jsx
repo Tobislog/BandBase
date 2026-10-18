@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState} from "react";
 import BasicButton from "./BasicButton";
+import SongItemOption from "./SongItemOption";
 import { Plus, Trash, Pen } from "lucide-react";
-
-import { getStoredSongs, saveStoredSongs } from '../services/storageService'
 
 export default function SongItem ({song, onAddSong, onEditSong, onDeleteSong}) {
     const [isDetailsVisible, setIsDetailsVisible] = useState(false);
 
     const handleInputChange = (e) => {
+        const {name, value } = e.target;
         const updatedSong = {
             ...song,
-            name: e.target.value
+            [name]: value
         };
         onEditSong(updatedSong);
     }
@@ -19,7 +19,8 @@ export default function SongItem ({song, onAddSong, onEditSong, onDeleteSong}) {
         <div className="flex flex-col justify center p-2 m-2 bg-surface rounded border border-line" >
                         <div className="flex flex-row justify-between items-center">
                             <input 
-                                type="text" 
+                                type="text"
+                                name="name" 
                                 value={song.name} 
                                 onChange={handleInputChange} 
                                 disabled={!isDetailsVisible}
@@ -32,8 +33,10 @@ export default function SongItem ({song, onAddSong, onEditSong, onDeleteSong}) {
                             </div>
                         </div>
                         {isDetailsVisible && (
-                            <div>
-                                hier?
+                            <div className="flex flex-row gap-2">
+                                <SongItemOption type="text" name="interpret" title="Interpret" onChange={handleInputChange}/>
+                                <SongItemOption type="time" name="duration" title="Duration" onChange={handleInputChange}/>
+                                <SongItemOption type="number" name="bpm" title="BPM" onChange={handleInputChange}/>
                             </div>
                         )}
                     </div>
