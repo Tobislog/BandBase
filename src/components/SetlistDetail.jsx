@@ -72,7 +72,7 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                         <BasicButton title="Break" icon={<Coffee />} />
                     </div>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
+                <div className="max-h-100 overflow-y-auto flex flex-col items-stretch justify-center gap-2 rounded-xl border border-dashed border-line px-4 py-6 text-center">
                     {(activeSetlist.songs.length > 0) ? (
                         setlistSongs.map((song) => (
                             <SetlistSongItem

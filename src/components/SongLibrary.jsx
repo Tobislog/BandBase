@@ -10,7 +10,7 @@ export default function SongLibrary ({ songs, onCreateSong, onAddSong, onEditSon
             <div className="flex justify-end border-b border-line p-2 h-12">
                 <BasicButton title="Add Song" icon={<Plus />} onClick={onCreateSong} />
             </div>
-            <div>
+            <div className="max-h-143 overflow-y-auto">
                 {songs.map((song) => (
                     <SongItem 
                         key={song.id}
