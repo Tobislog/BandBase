@@ -22,6 +22,22 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
             rowId: entry.rowId
         };
     });
+
+    const totalSeconds = setlistSongs.reduce((acc, song) => {
+        if (!song.duration || typeof song.duration !== 'string') return acc;
+
+        const [minutes, seconds] = song.duration.split(":").map(Number);
+        const songSeconds = (minutes || 0) * 60 + (seconds || 0);
+
+        return acc + songSeconds;
+    }, 0);
+    
+    const totalHours = Math.floor(totalSeconds / 3600);
+    const totalMinutes = Math.floor((totalSeconds / 60) % 60);
+    const remainingSeconds = totalSeconds % 60;
+
+    const formattedTotalDuration = `${totalHours}h ${totalMinutes} min ${remainingSeconds}s`
+
     return (
         <BasicTile>
             <div className="flex flex-col gap-4 p-4">
@@ -49,7 +65,7 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                     </div>
                 </div>
                 <div className="flex justify-between">
-                    <span className="inline-flex items-center gap-1 rounded-md text-xs">Gesamt 0 min</span>
+                    <span className="inline-flex items-center gap-1 rounded-md text-xs">Gesamt {formattedTotalDuration}</span>
                     <div className="ml-auto inline-flex items-center gap-1.5">
                         <BasicButton title="Block" icon={<Form />} />
                         <BasicButton title="Note" icon={<Notebook />} />
