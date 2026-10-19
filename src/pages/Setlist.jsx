@@ -53,17 +53,12 @@ export default function Setlist () {
     const handleInputChange = (e) => {
         if (!activeSetlist) return;
         const {name, value } = e.target;
-
+        
         const updatedActiveSetlist = {
             ...activeSetlist,
             [name]: value
         };
         setActiveSetlist(updatedActiveSetlist);
-
-        setActiveSetlist(prev => ({
-            ...prev,
-            [name]: value
-        }));
 
         const updatedSetlists = setlists.map(setlist => setlist.id === activeSetlist.id ? updatedActiveSetlist : setlist);
         setSetLists(updatedSetlists);

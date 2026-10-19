@@ -1,13 +1,29 @@
-import React from "react";
 import { Trash, Form, Notebook, Coffee, Download } from "lucide-react";
 import BasicTile from "./BasicTile";
 import BasicButton from "./BasicButton";
+import SetlistSongItem from "./SetlistSongItem";
 
 export default function SetlistDetail ({ activeSetlist, songs, onInputChange, onDeleteSong, onDelete}) {
-
+    
+    if (!activeSetlist) {
+        return (
+            <BasicTile>
+                <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
+                    Setlist auswählen
+                </div>
+            </BasicTile>
+        )
+    }
+    
+    const setlistSongs = activeSetlist.songs.map((entry) => {
+        const song = songs.find((e) => e.id === entry.songId);
+        return {
+            ...song,
+            rowId: entry.rowId
+        };
+    });
     return (
         <BasicTile>
-            {activeSetlist ? (
             <div className="flex flex-col gap-4 p-4">
                 <div className="flex flex-row flex-wrap items-center gap-1.5">
                     <input 
@@ -42,11 +58,12 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                 </div>
                 <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
                     {(activeSetlist.songs.length > 0) ? (
-                        activeSetlist.songs.map((entry) => (
-                        <div key={entry.rowId} className="flex flex-row items-center justify-between rounded bg-surface gap-2 p-2">
-                            <div>{songs.find((e) => e.id === entry.songId).name}</div>
-                            <BasicButton icon={<Trash />} isDelete onClick={() => onDeleteSong(entry.rowId)}/>
-                        </div>
+                        setlistSongs.map((song) => (
+                            <SetlistSongItem
+                                key={song.rowId}
+                                song={song}
+                                onDelete={onDeleteSong}
+                            />
                         ))
                     ) : (
                         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-4 text-center">
@@ -55,11 +72,6 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                     )}
                 </div>
             </div>
-            ) : (
-            <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line px-6 py-14 text-center">
-                Setlist auswählen
-            </div>
-            )}
         </BasicTile>
     )
 }

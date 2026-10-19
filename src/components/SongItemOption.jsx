@@ -1,6 +1,6 @@
 export default function SongItemOption ({title, type, name, value, onChange}) {
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
             <label htmlFor={title} className="text-xs">{title}</label>
             <input 
                 type={type} 
