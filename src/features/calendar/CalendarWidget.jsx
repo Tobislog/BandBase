@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import BasicButton from "../../components/BasicButton"
 import BasicTile from "../../components/BasicTile"
+import CalendarTile from "./CalendarTile";
 import { useState } from "react";
 
 export default function CalendarWidget () {
@@ -9,9 +10,29 @@ export default function CalendarWidget () {
     const activeMonth = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(currentDate);
     const activeYear = currentDate.getFullYear();
 
-    console.log(weekDays[currentDate.getDay()])
+    const monthIndex = currentDate.getMonth();
 
-    
+    const firstDayOfMonth = new Date(activeYear, monthIndex, 1);
+    let firstDayOfWeek = firstDayOfMonth.getDay();
+    const startingDayIndex = (firstDayOfWeek + 6) % 7;
+
+    const totalDaysInMonth = new Date(activeYear, monthIndex + 1, 0).getDate();
+
+    const calendarCells = [];
+    // Empty Cells for Offset
+    for (let i = 0; i < startingDayIndex; i++) {
+        calendarCells.push(null);
+    }
+    // Real Days
+    for (let day = 1; day <= totalDaysInMonth; day++ ) {
+        calendarCells.push(day);
+    }
+    // Fill up Empty cells to End
+    while (calendarCells.length % 7 !== 0) {
+        calendarCells.push(null);
+    }
+
+
     const handleMonthChange = (steps) => {  
         const nextDate = new Date(currentDate);
         nextDate.setMonth(nextDate.getMonth() + steps);
@@ -49,7 +70,12 @@ export default function CalendarWidget () {
                     ))}
                 </div>
                 <div className="grid grid-cols-7">
-                    
+                    {calendarCells.map((day, index) => (
+                        <CalendarTile 
+                            key={index}
+                            day={day}
+                        />
+                    ))}
                 </div>
             </BasicTile>
         </div>    
