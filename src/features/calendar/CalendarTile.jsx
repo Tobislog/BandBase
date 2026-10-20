@@ -41,7 +41,7 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
             {day !== null ? (
                 <div 
                     key={day.getDate()}
-                    className="border  border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer min-w-0"
+                    className="border  border-line h-25 p-1 hover:bg-line overflow-hidden cursor-pointer min-w-0 max-w-30"
                     onClick={() => onDayClick(formatDateString(day))}
                 >
                     <div>
@@ -64,7 +64,7 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
                     </div>
                 </div>
             ):(
-                <div className="border border-line h-20 p-1">
+                <div className="border border-line h-25 p-1">
                 </div>
             ) }
             

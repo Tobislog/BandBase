@@ -21,7 +21,25 @@ export default function EventList ({events, currentDate, onClick}) {
             default: return 'bg-brand/20 text-brand';
         }
     }
+
+    const getDaysUntilEvent = (event) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const eventDate = new Date(event.date);
+        eventDate.setHours(0, 0, 0, 0);
+
+        const diffTime = eventDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) return null;
+        if (diffDays === 0) return 'today';
+        if (diffDays === 1) return 'in 1 Day';
     
+        // For all Days > 1
+        return `in ${diffDays} Days`;
+    }
+
     return (
         <BasicTile
             title="Upcomming"
@@ -34,8 +52,12 @@ export default function EventList ({events, currentDate, onClick}) {
                     onClick={() => onClick(event)}
                     className="flex flex-col bg-surface rounded p-2 cursor-pointer"
                 >
-                    <div>
-                        {event.title}
+                    <div className="flex gap-6 justify-between">
+                        <div className="flex gap-1">
+                            <span className={`rounded-xl px-2 py-1 text-xs ${getCategoryColor(event.category)}`}>{event.category}</span>
+                            <span className="font-bold">{event.title}</span>
+                        </div>
+                        <span className="rounded-xl px-2 py-1 text-xs bg-line">{getDaysUntilEvent(event)}</span>
                     </div>
                     <div>
                         {event.date}
