@@ -7,8 +7,7 @@ import { CalendarDaysIcon, HomeIcon, ListMusic, MessagesCircle } from "lucide-re
 
 export const NAV_ITEMS = [
     { path: '/', name: 'Home', icon: <HomeIcon />, component: <Home />, title: 'Home' },
+    { path: '/calendar', name: 'Calendar', icon: <CalendarDaysIcon />, component: <Calendar />, title: 'Calendar' },
     { path: '/setlist', name: 'Setlists', icon: <ListMusic />, component: <Setlist />, title: 'Setlists' },
-    { path: '/chat', name: 'Messages', icon: <MessagesCircle />, component: <Messenger />, title: 'Messages' },
-    { path: '/calendar', name: 'Calendar', icon: <CalendarDaysIcon />, component: <Calendar />, title: 'Calendar' }
-    
+    { path: '/chat', name: 'Messages', icon: <MessagesCircle />, component: <Messenger />, title: 'Messages' }
 ];
