@@ -11,6 +11,8 @@ export default function Calendar () {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [events, setEvents] = useState([]);
     const [modalEvent, setModalEvent] = useState(null);
+    const [currentDate, setCurrentDate] = useState(new Date());
+
 
     useEffect(() => {
         const loadedEvents = getStoredEvents();
@@ -71,13 +73,19 @@ export default function Calendar () {
                             onClick={handleNewEventClick}
                         />}
             />
-            <div className="flex flex-row flex-wrap">
+            <div className="flex flex-row flex-wrap gap-6">
                 <CalendarWidget 
                     events={events}
                     onOpenEvent={handleOpenEvent}
                     onDayClick={handleDayClick}
+                    currentDate={currentDate}
+                    setCurrentDate={setCurrentDate}
                 />
-                <EventList />
+                <EventList 
+                    events={events}
+                    currentDate={currentDate}
+                    onClick={handleOpenEvent}
+                />
                 <EventModal
                     isOpen={isModalOpen}
                     event={modalEvent}

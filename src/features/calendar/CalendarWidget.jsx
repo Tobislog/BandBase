@@ -4,9 +4,8 @@ import BasicTile from "../../components/BasicTile"
 import CalendarTile from "./CalendarTile";
 import { useState } from "react";
 
-export default function CalendarWidget ({events, onOpenEvent, onDayClick}) {
+export default function CalendarWidget ({events, onOpenEvent, onDayClick, currentDate, setCurrentDate}) {
     const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-    const [currentDate, setCurrentDate] = useState(new Date());
 
     const activeMonth = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(currentDate);
     const activeYear = currentDate.getFullYear();
