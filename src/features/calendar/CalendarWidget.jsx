@@ -7,9 +7,9 @@ import { useState } from "react";
 export default function CalendarWidget () {
     const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     const [currentDate, setCurrentDate] = useState(new Date());
+
     const activeMonth = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(currentDate);
     const activeYear = currentDate.getFullYear();
-
     const monthIndex = currentDate.getMonth();
 
     const firstDayOfMonth = new Date(activeYear, monthIndex, 1);
@@ -25,13 +25,12 @@ export default function CalendarWidget () {
     }
     // Real Days
     for (let day = 1; day <= totalDaysInMonth; day++ ) {
-        calendarCells.push(day);
+        calendarCells.push(new Date(activeYear, monthIndex, day));
     }
     // Fill up Empty cells to End
     while (calendarCells.length % 7 !== 0) {
         calendarCells.push(null);
     }
-
 
     const handleMonthChange = (steps) => {  
         const nextDate = new Date(currentDate);
