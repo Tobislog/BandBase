@@ -1,7 +1,7 @@
 import React from "react";
 import { ListMusic, Plus } from "lucide-react";
-import BasicTile from "./BasicTile";
-import BasicButton from "./BasicButton";
+import BasicTile from "../../components/BasicTile";
+import BasicButton from "../../components/BasicButton";
 
 export default function SetlistSelector ({ setlists, activeSetlist, onSelect, onCreate }) {
 
@@ -13,7 +13,7 @@ export default function SetlistSelector ({ setlists, activeSetlist, onSelect, on
                         <div 
                             key={setlist.id} 
                             onClick={() => onSelect(setlist)} 
-                            className={`p-2 rounded border border-line-accent hover:bg-surface hover:border-none ${activeSetlist?.id === setlist.id ? 'bg-line-accent' : ''}`}
+                            className={`p-2 rounded border border-line-accent cursor-pointer hover:bg-surface hover:border-none ${activeSetlist?.id === setlist.id ? 'bg-line-accent' : ''}`}
                         >
                             <span className="text-sm ">{setlist.name}</span>
                             <span className="ml-1">({setlist.songs.length})</span>

@@ -1,6 +1,6 @@
 import { Library, Plus } from "lucide-react";
-import BasicButton from "./BasicButton";
-import BasicTile from "./BasicTile";
+import BasicButton from "../../components/BasicButton";
+import BasicTile from "../../components/BasicTile";
 import SongItem from "./SongItem";
 
 export default function SongLibrary ({ songs, onCreateSong, onAddSong, onEditSong, onDeleteSong}) {

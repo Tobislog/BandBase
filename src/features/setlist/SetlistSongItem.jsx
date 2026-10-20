@@ -1,4 +1,4 @@
-import BasicButton from "./BasicButton"
+import BasicButton from "../../components/BasicButton"
 import { Trash } from "lucide-react"
 
 export default function SetlistSongItem ({song, onDelete}) {

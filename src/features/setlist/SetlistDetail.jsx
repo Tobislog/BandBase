@@ -1,6 +1,6 @@
 import { Trash, Form, Notebook, Coffee, Download } from "lucide-react";
-import BasicTile from "./BasicTile";
-import BasicButton from "./BasicButton";
+import BasicTile from "../../components/BasicTile";
+import BasicButton from "../../components/BasicButton";
 import SetlistSongItem from "./SetlistSongItem";
 
 export default function SetlistDetail ({ activeSetlist, songs, onInputChange, onDeleteSong, onDelete}) {

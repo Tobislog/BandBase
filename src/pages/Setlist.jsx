@@ -2,11 +2,10 @@ import React, { useState, useEffect, act } from "react"
 import { Form, ListMusic, Library, Plus, Trash, Coffee, Notebook, Download, Pen } from "lucide-react"
 import { getStoredSetlists, saveStoredSetlists , getStoredSongs, saveStoredSongs } from '../services/storageService'
 
-import BasicTile from "../components/BasicTile";
-import BasicButton from "../components/BasicButton";
-import SongLibrary from "../components/SongLibrary";
-import SetlistSelector from "../components/SetlistSelector";
-import SetlistDetail from "../components/SetlistDetail";
+import PageHeading from "../components/PageHeading";
+import SongLibrary from "../features/songs/SongLibrary";
+import SetlistSelector from "../features/setlist/SetlistSelector";
+import SetlistDetail from "../features/setlist/SetlistDetail";
 
 export default function Setlist () {
     const [setlists, setSetLists] = useState([]);
@@ -128,13 +127,10 @@ export default function Setlist () {
 
     return (
         <div>
-            {/* Page-Heading */}
-            <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-                <div>
-                    <h1 className="text-xl font-bold text-heading">Setlist & Songarchiv</h1>
-                    <p className="mt-1 text-sm ">Manage your Repertoire and Setlist-Database</p>
-                </div>
-            </div>
+            <PageHeading 
+                title="Setlist & Songarchiv"
+                subtitle="Manage your Repertoire and Setlist-Database"
+            />
             {/* Page-Content */}
             <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
                 {/* Setlist Section */}

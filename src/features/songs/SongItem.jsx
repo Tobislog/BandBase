@@ -1,5 +1,5 @@
 import { useState} from "react";
-import BasicButton from "./BasicButton";
+import BasicButton from "../../components/BasicButton";
 import SongItemOption from "./SongItemOption";
 import { Plus, Trash, Pen } from "lucide-react";
 

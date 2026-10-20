@@ -11,8 +11,8 @@ export default function Header () {
 
     return (
         <header className="h-12 flex flex-row items-center px-6 justify-between bg-line">
-            <h1 className="text-lg font-semibold">{pageTitle}</h1>
-            <span className="text-sm" >Login</span>
+            <h1 className="text-lg font-semibold text-heading">{pageTitle}</h1>
+            <span className="text-sm">Login</span>
         </header>
     )
 }
