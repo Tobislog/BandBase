@@ -48,7 +48,8 @@ export default function Calendar () {
             id: crypto.randomUUID(),
             title: '',
             date: dateString,
-            description: ''
+            description: '',
+            categotry: 'Other'
         });
         setIsModalOpen(true);
     }

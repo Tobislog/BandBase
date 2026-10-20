@@ -31,4 +31,6 @@
   --color-line: var(--border-color);
   --color-line-accent: var(--border-color-accent);
   --color-brand: var(--accent-color);
+  --color-rehearsal: #ffd700;
+  --color-gig: #a174c4;
 }

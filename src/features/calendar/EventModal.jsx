@@ -7,16 +7,19 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [description, setDescription] = useState('');
+    const [category, setCategory] = useState('Other');
 
     useEffect(() => {
         if (event) {
         setTitle(event.title || '');
         setDate(event.date || '');
         setDescription(event.description || '');
+        setCategory(event.category || 'Other')
         } else {
             setTitle('');
             setDate('');
             setDescription('');
+            setCategory('Other')
         }
     },[event, isOpen]);
 
@@ -36,12 +39,10 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
             id: event ? event.id : crypto.randomUUID(),
             title,
             date, // Format: YYY-MM-DD
-            description
+            description,
+            category
         });
 
-        setTitle('');
-        setDate('');
-        setDescription('');
         onClose();
     }
     return (
@@ -72,6 +73,18 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
                             required
                         />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1"> Category</label>
+                        <select 
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand bg-surface"
+                        >
+                            <option value="Rehearsal">Rehearsal</option>
+                            <option value="Gig">Gig</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Description</label>

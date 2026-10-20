@@ -14,6 +14,14 @@ export default function EventList ({events, currentDate, onClick}) {
         return isSameMonth && isSameYear;
     })
 
+    const getCategoryColor = (category) => {
+        switch (category) {
+            case 'Rehearsal': return 'bg-rehearsal/20 text-rehearsal';
+            case 'Gig': return 'bg-gig/20 text-gig';
+            default: return 'bg-brand/20 text-brand';
+        }
+    }
+    
     return (
         <BasicTile
             title="Upcomming"

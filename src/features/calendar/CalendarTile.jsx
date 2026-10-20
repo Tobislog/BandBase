@@ -24,7 +24,13 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
 
     }
 
-    
+    const getCategoryColor = (category) => {
+        switch (category) {
+            case 'Rehearsal': return 'bg-rehearsal/20 text-rehearsal';
+            case 'Gig': return 'bg-gig/20 text-gig';
+            default: return 'bg-brand/20 text-brand';
+        }
+    }
 
     const tileEvents = getDayEvents();
     const isToday = checkIfToday(day);
@@ -35,13 +41,13 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
             {day !== null ? (
                 <div 
                     key={day.getDate()}
-                    className="border min-w-20 border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer"
+                    className="border  border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer min-w-0"
                     onClick={() => onDayClick(formatDateString(day))}
                 >
                     <div>
                         <p className={`p-0.5 rounded-xl max-w-6.5 ${isToday ? 'bg-brand' : ''}`}>{day.getDate()}</p>
                     </div>
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 overflow-x-auto min-w-0">
                         {tileEvents.map((event, index) => (
                             <span
                                 key={event.id || index}
@@ -50,7 +56,7 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
                                     e.stopPropagation();
                                     onOpenEvent(event);
                                 }}
-                                className="text-xs bg-brand/20 text-brand px-1 rounded cursor-pointer"
+                                className={`text-xs px-1 rounded cursor-pointer truncate ${getCategoryColor(event.category)}`}
                             >
                                 {event.title}
                             </span>
