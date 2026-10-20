@@ -1,6 +1,7 @@
 import { CalendarPlus } from "lucide-react";
 import BasicButton from "../components/BasicButton";
 import PageHeading from "../components/PageHeading";
+import CalendarWidget from "../features/calendar/CalendarWidget";
 
 export default function Calendar () {
     const handleAddEvent = () => {
@@ -18,10 +19,7 @@ export default function Calendar () {
                             onClick={handleAddEvent}
                         />}
             />
-            {/* Calender-Widget */}
-            <section>
-                
-            </section>
+            <CalendarWidget />
             {/* Events-List */}
             <section>
                 
