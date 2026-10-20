@@ -1,4 +1,4 @@
-export default function CalendarTile ({ day, events }) {
+export default function CalendarTile ({ day, events , onOpenEvent}) {
     const today = new Date();
 
     const checkIfToday = (day) => {
@@ -29,16 +29,17 @@ export default function CalendarTile ({ day, events }) {
     return(
         <>
             {day !== null ? (
-                <div className="border border-line h-20 p-1 hover:bg-line overflow-hidden">
+                <div className="border border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer">
                     <div>
                         <p className={`p-0.5 rounded-xl max-w-6.5 ${isToday ? 'bg-brand' : ''}`}>{day.getDate()}</p>
                     </div>
-                    <div>
-                        {tileEvents.map((event, index) => (
+                    <div className="flex flex-col gap-0.5">
+                        {tileEvents.map((event) => (
                             <span
-                                key={index}
-                                className="bg-brand/20 text-brand px-1 rounded"
-                                title="event.title"
+                                key={event.id}
+                                id={event.id}
+                                onClick={() => onOpenEvent(event)}
+                                className="text-xs bg-brand/20 text-brand px-1 rounded cursor-pointer"
                             >
                                 {event.title}
                             </span>

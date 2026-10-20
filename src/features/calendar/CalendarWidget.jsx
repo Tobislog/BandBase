@@ -4,7 +4,7 @@ import BasicTile from "../../components/BasicTile"
 import CalendarTile from "./CalendarTile";
 import { useState } from "react";
 
-export default function CalendarWidget ({events}) {
+export default function CalendarWidget ({events, onOpenEvent}) {
     const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -42,7 +42,6 @@ export default function CalendarWidget ({events}) {
         setCurrentDate(new Date());
     }
 
-
     return (
         <div className="max-w-150">
             <div className="mb-6 flex justify-between items-center">
@@ -74,6 +73,7 @@ export default function CalendarWidget ({events}) {
                             key={index}
                             day={day}
                             events={events}
+                            onOpenEvent={onOpenEvent}
                         />
                     ))}
                 </div>

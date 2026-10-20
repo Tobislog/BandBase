@@ -1,14 +1,28 @@
-import { useState } from "react";
-import { CircleX, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CircleX, Save, Trash, UserCheck } from "lucide-react";
 import BasicButton from "../../components/BasicButton";
 
-export default function EventModal ({isOpen, onClose, onSave}) {
+export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) {
 
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [description, setDescription] = useState('');
 
+    useEffect(() => {
+        if (event) {
+        setTitle(event.title || '');
+        setDate(event.date || '');
+        setDescription(event.description || '');
+        } else {
+            setTitle('');
+            setDate('');
+            setDescription('');
+        }
+    },[event, isOpen]);
+
     if (!isOpen) return null;
+
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -19,7 +33,7 @@ export default function EventModal ({isOpen, onClose, onSave}) {
         }
 
         onSave({
-            id: crypto.randomUUID(),
+            id: event ? event.id : crypto.randomUUID(),
             title,
             date, // Format: YYY-MM-DD
             description
@@ -69,7 +83,12 @@ export default function EventModal ({isOpen, onClose, onSave}) {
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand resize-none"
                         />
                     </div>
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-4">
+                        <BasicButton 
+                            icon={<Trash />}
+                            onClick={onDelete}
+                            isDelete
+                        />
                         <BasicButton 
                             icon={<Save />}
                             onClick={handleSubmit}
