@@ -48,7 +48,7 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-surface rounded-xl shadow-2xl w-full max-w-md p-6 border border-line">
                 <div className="flex justify-between items-center mb-4 border-b border-line pb-2">
-                    <h3>New Event</h3>
+                    <h3>Event</h3>
                     <BasicButton icon={<CircleX />} onClick={onClose}/>
                 </div>
                 <form className="flex flex-col gap-4">

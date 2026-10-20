@@ -22,6 +22,7 @@ export default function EventList ({events, currentDate, onClick}) {
             <div className="flex flex-col gap-2 p-2">
             {activeMonthEvents.map((event) => (
                 <div 
+                    key={event.id}
                     onClick={() => onClick(event)}
                     className="flex flex-col bg-surface rounded p-2 cursor-pointer"
                 >

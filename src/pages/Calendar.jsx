@@ -45,6 +45,7 @@ export default function Calendar () {
 
     const handleDayClick = (dateString) => {
         setModalEvent({
+            id: crypto.randomUUID(),
             title: '',
             date: dateString,
             description: ''

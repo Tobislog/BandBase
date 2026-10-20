@@ -34,16 +34,17 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
         <>
             {day !== null ? (
                 <div 
-                    className="border border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer"
+                    key={day.getDate()}
+                    className="border min-w-20 border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer"
                     onClick={() => onDayClick(formatDateString(day))}
                 >
                     <div>
                         <p className={`p-0.5 rounded-xl max-w-6.5 ${isToday ? 'bg-brand' : ''}`}>{day.getDate()}</p>
                     </div>
                     <div className="flex flex-col gap-0.5">
-                        {tileEvents.map((event) => (
+                        {tileEvents.map((event, index) => (
                             <span
-                                key={event.id}
+                                key={event.id || index}
                                 id={event.id}
                                 onClick={(e) => {
                                     e.stopPropagation();
