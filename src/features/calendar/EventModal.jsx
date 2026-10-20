@@ -6,7 +6,7 @@ export default function EventModal ({isOpen, onClose, onSave}) {
 
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
-    const [description, setDesctiption] = useState('');
+    const [description, setDescription] = useState('');
 
     if (!isOpen) return null;
 
@@ -19,7 +19,7 @@ export default function EventModal ({isOpen, onClose, onSave}) {
         }
 
         onSave({
-            id: crypto.randomUUIDM(),
+            id: crypto.randomUUID(),
             title,
             date, // Format: YYY-MM-DD
             description
@@ -63,7 +63,7 @@ export default function EventModal ({isOpen, onClose, onSave}) {
                         <label className="block text-sm font-medium mb-1">Description</label>
                         <textarea 
                             value={description}
-                            onChange={(e) => setDesctiption(e.target.value)}
+                            onChange={(e) => setDescription(e.target.value)}
                             placeholder="Optional Details"
                             rows="3"
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand resize-none"

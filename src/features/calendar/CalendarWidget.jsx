@@ -4,7 +4,7 @@ import BasicTile from "../../components/BasicTile"
 import CalendarTile from "./CalendarTile";
 import { useState } from "react";
 
-export default function CalendarWidget () {
+export default function CalendarWidget ({events}) {
     const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -73,6 +73,7 @@ export default function CalendarWidget () {
                         <CalendarTile 
                             key={index}
                             day={day}
+                            events={events}
                         />
                     ))}
                 </div>
