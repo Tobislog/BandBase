@@ -1,5 +1,12 @@
-export default function CalendarTile ({ day, events , onOpenEvent}) {
+export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) {
     const today = new Date();
+
+    const formatDateString = (dateObj) => {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() +1).padStart(2, '0');
+        const dayNum = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${dayNum}`;
+    }
 
     const checkIfToday = (day) => {
         if (day === null) return false;
@@ -13,23 +20,23 @@ export default function CalendarTile ({ day, events , onOpenEvent}) {
     const getDayEvents = () => {
         if(!day) return [];
 
-        const year = day.getFullYear();
-        const month = String(day.getMonth() +1).padStart(2, '0');
-        const dayNum = String(day.getDate()).padStart(2, '0');
-        const dateString = `${year}-${month}-${dayNum}`;
-
-        return events.filter(event => event.date === dateString);
+        return events.filter(event => event.date === formatDateString(day));
 
     }
 
-    const tileEvents = getDayEvents();
+    
 
+    const tileEvents = getDayEvents();
     const isToday = checkIfToday(day);
+
 
     return(
         <>
             {day !== null ? (
-                <div className="border border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer">
+                <div 
+                    className="border border-line h-20 p-1 hover:bg-line overflow-hidden cursor-pointer"
+                    onClick={() => onDayClick(formatDateString(day))}
+                >
                     <div>
                         <p className={`p-0.5 rounded-xl max-w-6.5 ${isToday ? 'bg-brand' : ''}`}>{day.getDate()}</p>
                     </div>
@@ -38,7 +45,10 @@ export default function CalendarTile ({ day, events , onOpenEvent}) {
                             <span
                                 key={event.id}
                                 id={event.id}
-                                onClick={() => onOpenEvent(event)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenEvent(event);
+                                }}
                                 className="text-xs bg-brand/20 text-brand px-1 rounded cursor-pointer"
                             >
                                 {event.title}

@@ -5,6 +5,7 @@ import CalendarWidget from "../features/calendar/CalendarWidget";
 import { useState, useEffect } from "react";
 import EventModal from "../features/calendar/EventModal";
 import { getStoredEvents, saveStoredEvents } from "../services/storageService";
+import EventList from "../features/calendar/EventList";
 
 export default function Calendar () {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +41,15 @@ export default function Calendar () {
         setModalEvent(null);
     }
 
+    const handleDayClick = (dateString) => {
+        setModalEvent({
+            title: '',
+            date: dateString,
+            description: ''
+        });
+        setIsModalOpen(true);
+    }
+
     const handleOpenEvent = (event) => {
         setModalEvent(event);
         setIsModalOpen(true);
@@ -61,21 +71,21 @@ export default function Calendar () {
                             onClick={handleNewEventClick}
                         />}
             />
-            <CalendarWidget 
-                events={events}
-                onOpenEvent={handleOpenEvent}
-            />
-            {/* Events-List */}
-            <section>
-                
-            </section>
-            <EventModal
-                isOpen={isModalOpen}
-                event={modalEvent}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSaveEvent}
-                onDelete={handleDeleteEvent}
-            />
+            <div className="flex flex-row flex-wrap">
+                <CalendarWidget 
+                    events={events}
+                    onOpenEvent={handleOpenEvent}
+                    onDayClick={handleDayClick}
+                />
+                <EventList />
+                <EventModal
+                    isOpen={isModalOpen}
+                    event={modalEvent}
+                    onClose={() => setIsModalOpen(false)}
+                    onSave={handleSaveEvent}
+                    onDelete={handleDeleteEvent}
+                />
+            </div>
         </div>
     );
 }
