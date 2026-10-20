@@ -2,11 +2,12 @@ import { CalendarPlus } from "lucide-react";
 import BasicButton from "../components/BasicButton";
 import PageHeading from "../components/PageHeading";
 import CalendarWidget from "../features/calendar/CalendarWidget";
+import { useState } from "react";
+import EventModal from "../features/calendar/EventModal";
 
 export default function Calendar () {
-    const handleAddEvent = () => {
-        return
-    }
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     return (
         <div>
@@ -16,7 +17,7 @@ export default function Calendar () {
                 button={<BasicButton 
                             title="New Event"
                             icon={<CalendarPlus />}
-                            onClick={handleAddEvent}
+                            onClick={() => setIsModalOpen(true)}
                         />}
             />
             <CalendarWidget />
@@ -24,6 +25,10 @@ export default function Calendar () {
             <section>
                 
             </section>
+            <EventModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </div>
     );
 }
