@@ -42,6 +42,14 @@ export default function EventList ({events, currentDate, onClick}) {
         return `in ${diffDays} Days`;
     }
 
+    const formatDateString = (string) => {
+        const dateObj = new Date(string);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() +1).padStart(2, '0');
+        const dayNum = String(dateObj.getDate()).padStart(2, '0');
+        return `${dayNum}.${month}.${year}`;
+    }
+
     return (
         <BasicTile
             title="Upcomming"
@@ -61,8 +69,8 @@ export default function EventList ({events, currentDate, onClick}) {
                         </div>
                         <span className="rounded-xl px-2 py-1 text-xs bg-line">{getDaysUntilEvent(event)}</span>
                     </div>
-                    <div>
-                        {event.date}
+                    <div className="text-sm p-1">
+                        {formatDateString(event.date)}
                     </div>
                 </div>
                 
