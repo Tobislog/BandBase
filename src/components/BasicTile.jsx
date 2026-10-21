@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function BasicTile ({children, title, icon}) {
+export default function BasicTile ({children, title, icon, button}) {
     return (
         <div className="rounded-xl border border-line overflow-hidden bg-surface-accent">
             {title && (
@@ -10,6 +10,7 @@ export default function BasicTile ({children, title, icon}) {
                         {icon && React.cloneElement(icon, {className: "h-4 w-4"})} 
                         {title}
                     </h2>
+                    {button}
                 </div>
             )}
             {children}

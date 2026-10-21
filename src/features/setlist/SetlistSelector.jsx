@@ -6,7 +6,7 @@ import BasicButton from "../../components/BasicButton";
 export default function SetlistSelector ({ setlists, activeSetlist, onSelect, onCreate }) {
 
     return (
-        <BasicTile title="Setlists" icon={<ListMusic />}>
+        <BasicTile title="Setlists" icon={<ListMusic />} button={<BasicButton title="Setlist" icon={<Plus />} onClick={onCreate}/>}>
             <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex flex-row flex-wrap items-center gap-2 ">
                     {setlists.map((setlist) => (
@@ -20,11 +20,6 @@ export default function SetlistSelector ({ setlists, activeSetlist, onSelect, on
                         </div>
                     ))}
                 </div>
-                <BasicButton 
-                    title="Setlist"
-                    icon={<Plus />}
-                    onClick={onCreate}
-                />
             </div>
         </BasicTile>
     )

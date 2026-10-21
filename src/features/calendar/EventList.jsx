@@ -2,16 +2,18 @@ import { CalendarChevronsRight } from "lucide-react";
 import BasicTile from "../../components/BasicTile";
 
 export default function EventList ({events, currentDate, onClick}) {
+    const currentDay = currentDate.getDate();
     const currentMonthIndex = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
 
     const activeMonthEvents = events.filter(e => {
         const eventDate = new Date(e.date);
 
+        const isUpcomming = eventDate.getDate() >= currentDay;
         const isSameMonth = eventDate.getMonth() === currentMonthIndex;
         const isSameYear = eventDate.getFullYear() === currentYear;
 
-        return isSameMonth && isSameYear;
+        return isUpcomming && isSameMonth && isSameYear;
     })
 
     const getCategoryColor = (category) => {
