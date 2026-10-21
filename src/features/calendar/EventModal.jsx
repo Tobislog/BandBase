@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CircleX, Save, Trash, UserCheck } from "lucide-react";
+import { CircleX, Save, Trash } from "lucide-react";
 import BasicButton from "../../components/BasicButton";
 
 export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) {
@@ -50,7 +50,7 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
             <div className="bg-surface rounded-xl shadow-2xl w-full max-w-md p-6 border border-line">
                 <div className="flex justify-between items-center mb-4 border-b border-line pb-2">
                     <h3>Event</h3>
-                    <BasicButton icon={<CircleX />} onClick={onClose}/>
+                    <BasicButton icon={<CircleX />} onClick={onClose} />
                 </div>
                 <form className="flex flex-col gap-4">
                     <div>

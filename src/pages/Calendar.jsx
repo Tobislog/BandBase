@@ -29,6 +29,7 @@ export default function Calendar () {
         } else {
             updatedEvents = [...events, savedEvent];
         }
+        updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
         setEvents(updatedEvents);
         saveStoredEvents(updatedEvents);
     }
@@ -37,6 +38,7 @@ export default function Calendar () {
         if (!modalEvent) return;
 
         const updatedEvents = events.filter(e => e.id !== modalEvent.id);
+        updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
         setEvents(updatedEvents);
         saveStoredEvents(updatedEvents);
         setIsModalOpen(false);
