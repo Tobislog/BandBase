@@ -1,12 +1,11 @@
-import React from "react";
-import { Home, ListMusic, MessageCircle, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import SidebarLink from "./SidebarLink";
 import { NAV_ITEMS } from "../config/navigation";
 
 export default function Sidebar ( { isOpen, onToggle }) {
 
     return (
-        <aside className={`flex flex-col gap-4 bg-surface-accent tansition-all duration-300 ${ isOpen ? 'w-64' : 'w-18'}`}>
+        <aside className={`flex flex-col gap-4 bg-surface-accent duration-300 ${ isOpen ? 'w-64' : 'w-18'}`}>
             <div className="flex flex-col gap-4 p-4">
                 <div 
                     onClick={onToggle}

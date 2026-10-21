@@ -34,9 +34,9 @@ export default function SongItem ({song, onAddSong, onEditSong, onDeleteSong}) {
                         </div>
                         {isDetailsVisible && (
                         <div className="flex flex-row gap-2">
-                            <SongItemOption type="text" name="interpret" title="Interpret" onChange={handleInputChange}/>
-                            <SongItemOption type="time" name="duration" title="Duration" onChange={handleInputChange}/>
-                            <SongItemOption type="number" name="bpm" title="BPM" onChange={handleInputChange}/>
+                            <SongItemOption type="text" name="interpret" title="Interpret" value={song.interpret} onChange={handleInputChange}/>
+                            <SongItemOption type="time" name="duration" title="Duration" value={song.duration} onChange={handleInputChange}/>
+                            <SongItemOption type="number" name="bpm" title="BPM" value={song.bpm} onChange={handleInputChange}/>
                         </div>
                         )}
                     </div>

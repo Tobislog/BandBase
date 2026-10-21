@@ -51,7 +51,7 @@ export default function Calendar () {
             title: '',
             date: dateString,
             description: '',
-            categotry: 'Other'
+            category: 'Other'
         });
         setIsModalOpen(true);
     }

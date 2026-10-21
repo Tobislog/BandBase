@@ -1,9 +1,6 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';
-import './App.css'
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 
-import Home from './pages/Home';
-import Setlist from './pages/Setlist';
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import { NAV_ITEMS } from './config/navigation';
@@ -23,7 +20,7 @@ function Layout() {
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         
         {/* Dynamic Page-Content */}
-        <main className="flex-1 overflow-x-hiden overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
         </main>
       </div>
@@ -44,8 +41,6 @@ function App() {
               element={item.component}
             />
           ))}
-          <Route index element={<Home />} />
-          <Route path="setlist" element={<Setlist />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -47,7 +47,7 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                         value={activeSetlist.name}
                         name = "name"
                         onChange={onInputChange}
-                        className="rounded-md border border-line px-3 test-sm h-10"  
+                        className="rounded-md border border-line px-3 text-sm h-10"  
                     />
                     <div>
                         <span className="text-xs font-medium">Stagetime</span>
@@ -56,7 +56,7 @@ export default function SetlistDetail ({ activeSetlist, songs, onInputChange, on
                             name="stageTime"
                             value={activeSetlist.stageTime || ''}
                             onChange={onInputChange}
-                            className="rounded-md border border-line text-sm h-8 px-2 w-24"
+                            className="rounded-md border border-line text-sm ml-2 h-8 px-2 w-24"
                         />
                     </div>
                     <div className="ml-auto flex items-center gap-1.5">
