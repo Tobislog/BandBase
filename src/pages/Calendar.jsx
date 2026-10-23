@@ -2,45 +2,20 @@ import { CalendarPlus } from "lucide-react";
 import BasicButton from "../components/BasicButton";
 import PageHeading from "../components/PageHeading";
 import CalendarWidget from "../features/calendar/CalendarWidget";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import EventModal from "../features/calendar/EventModal";
-import { getStoredEvents, saveStoredEvents } from "../services/storageService";
 import EventList from "../features/calendar/EventList";
+import { useEvent } from "../context/EventProvider";
 
 export default function Calendar () {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [events, setEvents] = useState([]);
+    const { events, saveEvent, deleteEvent} = useEvent();
     const [modalEvent, setModalEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date());
 
-
-    useEffect(() => {
-        const loadedEvents = getStoredEvents();
-        setEvents(loadedEvents);
-    }, []);
-
-    const handleSaveEvent = (savedEvent) => {
-
-        const exists = events.some(e => e.id === savedEvent.id);
-
-        let updatedEvents;
-        if (exists) {
-            updatedEvents = events.map(e => e.id === savedEvent.id ? savedEvent : e)
-        } else {
-            updatedEvents = [...events, savedEvent];
-        }
-        updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-        setEvents(updatedEvents);
-        saveStoredEvents(updatedEvents);
-    }
-
     const handleDeleteEvent = () => {
         if (!modalEvent) return;
-
-        const updatedEvents = events.filter(e => e.id !== modalEvent.id);
-        updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-        setEvents(updatedEvents);
-        saveStoredEvents(updatedEvents);
+        deleteEvent(modalEvent.id);
         setIsModalOpen(false);
         setModalEvent(null);
     }
@@ -94,7 +69,7 @@ export default function Calendar () {
                     isOpen={isModalOpen}
                     event={modalEvent}
                     onClose={() => setIsModalOpen(false)}
-                    onSave={handleSaveEvent}
+                    onSave={saveEvent}
                     onDelete={handleDeleteEvent}
                 />
             </div>
