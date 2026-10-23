@@ -1,14 +1,15 @@
 import { useAuth } from "../context/AuthProvider";
-import { useState } from "react";
 import PageHeading from "../components/PageHeading";
 import BasicTile from "../components/BasicTile";
 import BasicButton from "../components/BasicButton";
 import { CalendarDays, ClipboardList, MoveRight, MessagesCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEvent } from "../context/EventProvider";
 
 export default function Home () {
     const navigate = useNavigate();
     const {user} = useAuth();
+    const {events} = useEvent();
     const today = new Date();
     const dateOptions = {
         weekday: 'long',
@@ -17,9 +18,9 @@ export default function Home () {
         day: 'numeric'
     };
 
+    const getNextEvent = () => {
 
-
-
+    }
 
     return (
         <div>
