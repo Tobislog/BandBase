@@ -6,7 +6,7 @@ const formatDaysUntil = (dateKey) => {
 
         if (days < 0) return null;
         if (days === 0) return "today";
-        if (days === 1) return "in 1 days";
+        if (days === 1) return "in 1 Day";
         
         return `in ${days} Days`;
     }

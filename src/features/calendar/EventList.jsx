@@ -12,7 +12,7 @@ export default function EventList ({events, currentDate, onClick}) {
 
     return (
         <BasicTile
-            title="Upcomming"
+            title="Upcoming"
             icon={<CalendarChevronsRight />}
         >
             <div className="flex flex-col gap-2 p-2">

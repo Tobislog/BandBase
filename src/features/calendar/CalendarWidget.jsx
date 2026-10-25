@@ -2,7 +2,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import BasicButton from "../../components/BasicButton"
 import BasicTile from "../../components/BasicTile"
 import CalendarTile from "./CalendarTile";
-import { useState } from "react";
 
 export default function CalendarWidget ({events, onOpenEvent, onDayClick, currentDate, setCurrentDate}) {
     const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
