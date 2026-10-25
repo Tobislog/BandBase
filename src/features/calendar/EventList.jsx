@@ -1,20 +1,26 @@
 import { CalendarChevronsRight } from "lucide-react";
 import BasicTile from "../../components/BasicTile";
+import { toDateKey, formatDateKey, daysUntil, formatEventTimeRange } from "../../utils/date";
+
+    const formatDaysUntil = (dateKey) => {
+        const days = daysUntil(dateKey);
+
+        if (days < 0) return null;
+        if (days === 0) return "today";
+        if (days === 1) return "in 1 days";
+        
+        return `in ${days} Days`;
+    }
 
 export default function EventList ({events, currentDate, onClick}) {
-    const currentDay = currentDate.getDate();
-    const currentMonthIndex = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
 
-    const activeMonthEvents = events.filter(e => {
-        const eventDate = new Date(e.date);
+    const monthKey = toDateKey(currentDate).slice(0, 7);
+    const todayKey = toDateKey(new Date());
 
-        const isUpcomming = eventDate.getDate() >= currentDay;
-        const isSameMonth = eventDate.getMonth() === currentMonthIndex;
-        const isSameYear = eventDate.getFullYear() === currentYear;
 
-        return isUpcomming && isSameMonth && isSameYear;
-    })
+    
+    const activeMonthEvents = events.filter(event => event.date?.startsWith(monthKey) && event.date >= todayKey
+    );
 
     const getCategoryColor = (category) => {
         switch (category) {
@@ -22,32 +28,6 @@ export default function EventList ({events, currentDate, onClick}) {
             case 'Gig': return 'bg-gig/20 text-gig';
             default: return 'bg-brand/20 text-brand';
         }
-    }
-
-    const getDaysUntilEvent = (event) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const eventDate = new Date(event.date);
-        eventDate.setHours(0, 0, 0, 0);
-
-        const diffTime = eventDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 0) return null;
-        if (diffDays === 0) return 'today';
-        if (diffDays === 1) return 'in 1 Day';
-    
-        // For all Days > 1
-        return `in ${diffDays} Days`;
-    }
-
-    const formatDateString = (string) => {
-        const dateObj = new Date(string);
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() +1).padStart(2, '0');
-        const dayNum = String(dateObj.getDate()).padStart(2, '0');
-        return `${dayNum}.${month}.${year}`;
     }
 
     return (
@@ -67,10 +47,11 @@ export default function EventList ({events, currentDate, onClick}) {
                             <span className={`rounded-xl px-2 py-1 text-xs ${getCategoryColor(event.category)}`}>{event.category}</span>
                             <span className="font-bold">{event.title}</span>
                         </div>
-                        <span className="rounded-xl px-2 py-1 text-xs bg-line">{getDaysUntilEvent(event)}</span>
+                        <span className="rounded-xl px-2 py-1 text-xs bg-line">{formatDaysUntil(event.date)}</span>
                     </div>
                     <div className="text-sm p-1">
-                        {formatDateString(event.date)}
+                        {formatDateKey(event.date)}
+                        {event.startTime && ` · ${formatEventTimeRange(event)}`}
                     </div>
                 </div>
                 

@@ -13,21 +13,19 @@ export default function Calendar () {
     const [modalEvent, setModalEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    const handleDeleteEvent = () => {
-        if (!modalEvent) return;
-        deleteEvent(modalEvent.id);
+    const closeModal = () => {
         setIsModalOpen(false);
         setModalEvent(null);
     }
 
+    const handleDeleteEvent = () => {
+        if (!modalEvent?.id) return;
+        deleteEvent(modalEvent.id);
+        closeModal();
+    }
+
     const handleDayClick = (dateString) => {
-        setModalEvent({
-            id: crypto.randomUUID(),
-            title: '',
-            date: dateString,
-            description: '',
-            category: 'Other'
-        });
+        setModalEvent({ date: dateString });
         setIsModalOpen(true);
     }
 
@@ -65,13 +63,15 @@ export default function Calendar () {
                     currentDate={currentDate}
                     onClick={handleOpenEvent}
                 />
-                <EventModal
-                    isOpen={isModalOpen}
-                    event={modalEvent}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={saveEvent}
-                    onDelete={handleDeleteEvent}
-                />
+                {isModalOpen && (
+                    <EventModal
+                        key={modalEvent?.id ?? "new-event"}
+                        event={modalEvent}
+                        onClose={closeModal}
+                        onSave={saveEvent}
+                        onDelete={handleDeleteEvent}
+                    />
+                )}
             </div>
         </div>
     );

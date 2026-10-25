@@ -1,50 +1,38 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CircleX, Save, Trash } from "lucide-react";
 import BasicButton from "../../components/BasicButton";
+import { toEventForm } from "../../utils/event";
+import { addHoursToTime, isOvernightEvent } from "../../utils/date";
 
-export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) {
+export default function EventModal ({ event, onClose, onSave, onDelete}) {
 
-    const [title, setTitle] = useState('');
-    const [date, setDate] = useState('');
-    const [description, setDescription] = useState('');
-    const [category, setCategory] = useState('Other');
+    const [form, setForm] = useState(() => toEventForm(event));
+    const [endTimeTouched, setEndTimeTouched] = useState(false);
 
-    useEffect(() => {
-        if (event) {
-        setTitle(event.title || '');
-        setDate(event.date || '');
-        setDescription(event.description || '');
-        setCategory(event.category || 'Other')
-        } else {
-            setTitle('');
-            setDate('');
-            setDescription('');
-            setCategory('Other')
-        }
-    },[event, isOpen]);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'endTime') setEndTimeTouched(true);
 
-    if (!isOpen) return null;
+        setForm(prev => {
+            const next = { ...prev, [name]: value };
 
-    
+            if (name === 'startTime' && !endTimeTouched) {
+                next.endTime = addHoursToTime(value, 2);
+            }
+            return next;
+        })
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        if (!title || !date) {
-            alert("Please set Title and Date!");
+        if (!form.title || !form.date || !form.startTime) {
+            alert("Please set Title, Date and Start time!");
             return;
         }
-
-        onSave({
-            id: event ? event.id : crypto.randomUUID(),
-            title,
-            date, // Format: YYY-MM-DD
-            description,
-            category
-        });
-
+        onSave(form);
         onClose();
     }
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-surface rounded-xl shadow-2xl w-full max-w-md p-6 border border-line">
@@ -56,9 +44,10 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
                     <div>
                         <label className="block text-sm font-medium mb-1">*Title</label>
                         <input 
-                            type="text" 
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            type="text"
+                            name="title" 
+                            value={form.title}
+                            onChange={handleChange}
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
                             placeholder="Title"
                             required
@@ -69,17 +58,51 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
                         <label className="block text-sm font-medium mb-1">*Date</label>
                         <input 
                             type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
+                            name="date"
+                            value={form.date}
+                            onChange={handleChange}
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
                             required
                         />
                     </div>
                     <div>
+                        <label className="block text-sm font-medium mb-1">Meetup</label>
+                        <input 
+                            type="time"
+                            name="meetupTime"
+                            value={form.meetupTime}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">*Start</label>
+                        <input 
+                            type="time"
+                            name="startTime"
+                            value={form.startTime}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">End</label>
+                        <input 
+                            type="time"
+                            name="endTime"
+                            value={form.endTime}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                        />
+                    </div>
+                    {isOvernightEvent(form) && (<p className="text-xs text-brand">Ende am Folgetag</p>)}
+                    <div>
                         <label className="block text-sm font-medium mb-1"> Category</label>
                         <select 
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
+                            name="category"
+                            value={form.category}
+                            onChange={handleChange}
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand bg-surface"
                         >
                             <option value="Rehearsal">Rehearsal</option>
@@ -90,19 +113,22 @@ export default function EventModal ({isOpen, event, onClose, onSave, onDelete}) 
                     <div>
                         <label className="block text-sm font-medium mb-1">Description</label>
                         <textarea 
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange}
                             placeholder="Optional Details"
                             rows="3"
                             className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand resize-none"
                         />
                     </div>
                     <div className="flex justify-end gap-4">
-                        <BasicButton 
-                            icon={<Trash />}
-                            onClick={onDelete}
-                            isDelete
-                        />
+                        {event?.id && (
+                            <BasicButton 
+                                icon={<Trash />}
+                                onClick={onDelete}
+                                isDelete
+                            />
+                        )}
                         <BasicButton 
                             icon={<Save />}
                             onClick={handleSubmit}

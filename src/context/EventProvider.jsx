@@ -1,26 +1,28 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { saveStoredEvents, getStoredEvents } from "../services/storageService";
+import { compareEvents } from "../utils/date";
+import { normalizeEvent } from "../utils/event";
 
 const EventContext = createContext(null);
 
-const sortEvents = (events) =>
-    [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+const sortEvents = (events) => [...events].sort(compareEvents);
 
 
 export function EventProvider({children}) {
     const [events, setEvents] = useState(() => sortEvents(getStoredEvents()));
     
     useEffect(() => {
-        const loadedEvents = getStoredEvents();
-        setEvents(loadedEvents);
-    }, []);
+        saveStoredEvents(events);
+    }, [events]);
 
     const saveEvent = (savedEvent) => {
+        const normalizedEvent = normalizeEvent(savedEvent);
+
         setEvents(prev =>
             sortEvents(
-                prev.some(e => e.id === savedEvent.id)
-                    ? prev.map(e => e.id === savedEvent.id ? savedEvent : e)
-                    : [...prev, savedEvent]
+                prev.some(e => e.id === normalizedEvent.id)
+                    ? prev.map(e => e.id === normalizedEvent.id ? normalizedEvent : e)
+                    : [...prev, normalizedEvent]
             )
         );
     };
