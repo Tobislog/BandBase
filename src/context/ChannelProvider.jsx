@@ -1,0 +1,83 @@
+import { createContext, useContext, useEffect, useState } from "react";
+import { getStoredChannels, getStoredChannelsMembers, getStoredMessages, saveStoredMessages } from "../services/storageService";
+import { useAuth } from "./AuthProvider";
+import { useBand } from "./BandProvider";
+
+const ChannelsContext = createContext(null);
+
+export function ChannelsProvider({children}) {
+    const { user } = useAuth();
+    const { band }  = useBand();
+    const [activeChannelId, setActiveChannelId] = useState(null);
+    const [userChannelIds, setUserChannelIds] = useState(new Set());
+    const [channels, setChannels] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if(!user?.id || !band?.id) {
+            setChannels([]);
+            setLoading(false);
+            return;
+        }
+
+        setUserChannelIds(new Set(getStoredChannelsMembers().filter(m => m.userId === user.id).map(m => m.channelId)));
+
+        const userChannels = getStoredChannels().filter(c => c.bandId === band.id && userChannelIds.has(c.id))
+        setChannels(userChannels);
+        setLoading(false);
+
+    }, [user?.id, band?.id]);
+
+    useEffect(() => {
+        const allMessages = getStoredMessages();
+        setMessages(allMessages.filter(m => m.channelId === activeChannelId).sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
+    }, [activeChannelId])
+
+    const sendMessage = (channelId, content) => {
+        if (!user.id) return;
+        if(!content.trim()) return;
+        if (!userChannelIds.has(channelId)) {
+            throw new Error("User has no Permission")
+        }
+
+        const allMessages = getStoredMessages();
+        const nextId = allMessages.length=== 0 ? 1 : Math.max(...allMessages.map(m => Number(m.id))) + 1;
+
+        const newMessage = {
+            id: nextId,
+            channelId: channelId,
+            userId: user.id,
+            content: content.trim(),
+            createdAt: new Date().toISOString(),
+            editedAt: null
+        }
+
+        const updated = [...allMessages, newMessage];
+        saveStoredMessages(updated);
+        setMessages(prev => [...prev, newMessage].sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
+        
+    }
+
+
+
+    return (
+        <ChannelsContext.Provider
+            value={{
+                channels,
+                activeChannelId,
+                setActiveChannelId,
+                messages,
+                sendMessage,
+                loading
+            }}>
+                {children}
+        </ChannelsContext.Provider>
+    )
+}
+
+export function useChannels () {
+    const ctx = useContext(ChannelsContext);
+        if (!ctx) throw new Error("useChannels must be used within a ChannelsProvider");
+        return ctx;
+}

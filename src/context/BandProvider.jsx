@@ -25,7 +25,7 @@ export function BandProvider ({children}) {
         setLoading(false);
     }, [user?.id]);
 
-    const band = bands.find(b => b.id === activeBandId) || { id: activeBandId, name:"Band_01", createdAt: "2026-10-27 12:27:00"};
+    const band = bands.find(b => b.id === activeBandId) || { id: activeBandId, name:"Band_01", createdAt: "2026-10-27T12:27:00"};
     const membership = memberships.find(m => m.bandId === activeBandId) || null;
     const role = membership?.role || null;
 

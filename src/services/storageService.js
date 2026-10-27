@@ -3,6 +3,9 @@ const SONGS_KEY = 'bandbase_songs';
 const EVENTS_KEY = 'bandbase_events';
 const BANDS_KEY = 'bandbase_bands'
 const MEMBERSHIPS_KEY = 'bandbase_band_memberships';
+const CHANNELS_KEY = 'bandbase_channels';
+const CHANNELS_MEMBERS_KEY = 'bandbase_channel_members';
+const MESSAGES_KEY = 'bandbase_messages';
 
 // Setlists
 export function getStoredSetlists() {
@@ -47,4 +50,31 @@ export function getStoredMemberships () {
 }
 export function setStoredMemberships (memberships) {
     localStorage.setItem(MEMBERSHIPS_KEY, JSON.stringify(memberships));
+}
+
+// Channels
+export function getStoredChannels () {
+    const data = localStorage.getItem(CHANNELS_KEY);
+    return data ? JSON.parse(data) : [];
+}
+export function setStoredChannels (channels) {
+    localStorage.setItem(CHANNELS_KEY, JSON.stringify(channels));
+}
+
+// Channel-Members
+export function getStoredChannelsMembers () {
+    const data = localStorage.getItem(CHANNELS_MEMBERS_KEY);
+    return data ? JSON.parse(data) : [];
+}
+export function setStoredChannelsMembers (members) {
+    localStorage.setItem(MEMBERSHIPS_KEY, JSON.stringify(members));
+}
+
+// Messages
+export function getStoredMessages () {
+    const data = localStorage.getItem(MESSAGES_KEY);
+    return data ? JSON.parse(data) : [];
+}
+export function setStoredMessages (messages) {
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
 }
