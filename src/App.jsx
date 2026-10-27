@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthProvider';
 import { EventProvider } from './context/EventProvider';
+import { BandProvider } from './context/BandProvider';
 
 
 
@@ -38,30 +39,32 @@ function Layout() {
 function App() {
   return (
     <AuthProvider>
-      <EventProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            {/* <Route path="/register" element={<Register />} /> */}
+      <BandProvider>
+        <EventProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              {/* <Route path="/register" element={<Register />} /> */}
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Layout />}>
-                {NAV_ITEMS.map((item) => (
-                  <Route 
-                    key={item.path}
-                    path={item.path === '/' ? undefined : item.path}
-                    index={item.path === '/'}
-                    element={item.component}
-                  />
-                ))}
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Layout />}>
+                  {NAV_ITEMS.map((item) => (
+                    <Route 
+                      key={item.path}
+                      path={item.path === '/' ? undefined : item.path}
+                      index={item.path === '/'}
+                      element={item.component}
+                    />
+                  ))}
+                </Route>
               </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </EventProvider>
+            </Routes>
+          </BrowserRouter>
+        </EventProvider>
+      </BandProvider>
     </AuthProvider>
   )
 }
