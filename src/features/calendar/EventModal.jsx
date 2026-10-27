@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { CircleX, Save, SendHorizonal, Trash } from "lucide-react";
 import BasicButton from "../../components/BasicButton";
+import ChatMessage from "../../components/ChatMessage";
 import { toEventForm } from "../../utils/event";
 import { addHoursToTime, isOvernightEvent } from "../../utils/date";
 import { useChannels } from "../../context/ChannelProvider";
@@ -183,9 +184,12 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                         </div>
                     </form>
                     <div>
+                        <h3 className="text-l font-semibold mb-3">Nachrichten</h3>
+                        <div className="flex flex-col gap-2 bg-surface-accent border border-line rounded p-2 mb-4 ">
                         {messages.map((m) => (
-                            <div key={m.id}>{m.content}</div>
+                            <ChatMessage key={m.id} message={m}/>
                         ))}
+                        </div>
                         <div className="flex flex-row items-center justify-between">
                             <input 
                                 type="text" 
