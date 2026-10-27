@@ -11,7 +11,7 @@ const sortEvents = (events) => [...events].sort(compareEvents);
 
 export function EventProvider({children}) {
     const [events, setEvents] = useState(() => sortEvents(getStoredEvents()));
-    const { createEventChannel } = useChannels();
+    const { createEventChannel, deleteChannel } = useChannels();
     
     useEffect(() => {
         saveStoredEvents(events);
@@ -35,6 +35,10 @@ export function EventProvider({children}) {
     };
 
     const deleteEvent = (id) => {
+        const eventToDelete = events.find(e => e.id === id);
+        if (eventToDelete?.channelId) {
+            deleteChannel(eventToDelete.channelId);
+        }
         setEvents(prev => prev.filter(e => e.id !== id));
     };
 

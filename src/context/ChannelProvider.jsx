@@ -93,6 +93,33 @@ export function ChannelsProvider({children}) {
         return nextId;
     }
 
+    const deleteChannel = (channelId) => {
+        if(!channelId) return;
+
+        const allChannels = getStoredChannels();
+        const updatedChannels = allChannels.filter(c => c.id !== channelId);
+        saveStoredChannels(updatedChannels);
+        setChannels(prev => prev.filter(c => c.id !== channelId));
+
+        setUserChannelIds(prev => {
+            const next = new Set(prev);
+            next.delete(channelId);
+            return next;
+        })
+
+        const allMembers = getStoredChannelsMembers();
+        const updatedMembers = allMembers.filter(m => m.channelId !== channelId);
+        saveStoredChannelsMembers(updatedMembers);
+
+        const allMessages = getStoredMessages();
+        const updatedMessages = allMessages.filter(m => m.channelId !== channelId);
+        saveStoredMessages(updatedMessages);
+        setMessages(prev => prev.filter(m => m.channelId !== channelId));
+
+        if (activeChannelId === channelId) {
+            setActiveChannelId(null);
+        }
+    }
 
 
     return (
@@ -100,6 +127,7 @@ export function ChannelsProvider({children}) {
             value={{
                 channels,
                 createEventChannel,
+                deleteChannel,
                 activeChannelId,
                 setActiveChannelId,
                 messages,
