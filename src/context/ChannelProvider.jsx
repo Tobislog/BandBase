@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getStoredChannels, getStoredChannelsMembers, getStoredMessages, saveStoredMessages } from "../services/storageService";
+import { getStoredChannels, getStoredChannelsMembers, saveStoredChannelsMembers, getStoredMessages, saveStoredChannels, saveStoredMessages } from "../services/storageService";
 import { useAuth } from "./AuthProvider";
 import { useBand } from "./BandProvider";
 
@@ -47,7 +47,7 @@ export function ChannelsProvider({children}) {
         }
 
         const allMessages = getStoredMessages();
-        const nextId = allMessages.length=== 0 ? 1 : Math.max(...allMessages.map(m => Number(m.id))) + 1;
+        const nextId = allMessages.length === 0 ? 1 : Math.max(...allMessages.map(m => Number(m.id))) + 1;
 
         const newMessage = {
             id: nextId,
@@ -64,12 +64,42 @@ export function ChannelsProvider({children}) {
         
     }
 
+    const createEventChannel = (event) => {
+        if(!user?.id || !band.id) return null;
+
+        const allChannels = getStoredChannels();
+        const nextId = allChannels.length === 0 ? 1 : Math.max(...allChannels.map(m => Number(m.id))) +1;
+        
+        const newChannel = {
+            id: nextId,
+            bandId: band.id,
+            type: 'event',
+            eventId: event.id,
+            name: event.title || 'Event-Chat', 
+            createdBy: user.id,
+            createdAt: new Date().toISOString(),
+        }
+        const allChannelMembers = getStoredChannelsMembers();
+        const newMember = {
+            channelId: nextId,
+            userId: user.id
+        }  
+
+        saveStoredChannels([...allChannels, newChannel]);
+        saveStoredChannelsMembers([...allChannelMembers, newMember]);
+
+        setChannels(prev => [...prev, newChannel]);
+        setUserChannelIds(prev => new Set([...prev, nextId]));
+        return nextId;
+    }
+
 
 
     return (
         <ChannelsContext.Provider
             value={{
                 channels,
+                createEventChannel,
                 activeChannelId,
                 setActiveChannelId,
                 messages,
@@ -81,7 +111,7 @@ export function ChannelsProvider({children}) {
     )
 }
 
-export function useChannels () {
+export function useChannels() {
     const ctx = useContext(ChannelsContext);
         if (!ctx) throw new Error("useChannels must be used within a ChannelsProvider");
         return ctx;

@@ -67,7 +67,7 @@ export function getStoredChannelsMembers () {
     return data ? JSON.parse(data) : [];
 }
 export function saveStoredChannelsMembers (members) {
-    localStorage.setItem(MEMBERSHIPS_KEY, JSON.stringify(members));
+    localStorage.setItem(CHANNELS_MEMBERS_KEY, JSON.stringify(members));
 }
 
 // Messages

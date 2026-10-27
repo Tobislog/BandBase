@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { saveStoredEvents, getStoredEvents } from "../services/storageService";
 import { compareEvents } from "../utils/date";
-import { normalizeEvent } from "../utils/event";
+import { normalizeEvent } from "../utils/event"
+import { useChannels } from "./ChannelProvider";
 
 const EventContext = createContext(null);
 
@@ -10,6 +11,7 @@ const sortEvents = (events) => [...events].sort(compareEvents);
 
 export function EventProvider({children}) {
     const [events, setEvents] = useState(() => sortEvents(getStoredEvents()));
+    const { createEventChannel } = useChannels();
     
     useEffect(() => {
         saveStoredEvents(events);
@@ -17,6 +19,11 @@ export function EventProvider({children}) {
 
     const saveEvent = (savedEvent) => {
         const normalizedEvent = normalizeEvent(savedEvent);
+
+        if(!normalizedEvent.id || !normalizedEvent.channelId) {
+            const channelId = createEventChannel(normalizedEvent);
+            normalizedEvent.channelId = channelId;
+        }
 
         setEvents(prev =>
             sortEvents(

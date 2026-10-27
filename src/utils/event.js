@@ -1,11 +1,14 @@
+import { getStoredEvents } from "../services/storageService";
 import { addHoursToTime } from "./date";
 
 export const DEFAULT_START_TIME = '19:00';
-export const DEFAULT_END_TIME = addHoursToTime(DEFAULT_START_TIME, 2);
+export const DEFAULT_END_TIME = '21:00';
 
 export function createEvent(overrides = {}) {
+    const allEvents = getStoredEvents();
+    const nextId = allEvents.length === 0 ? 1 : Math.max(...allEvents.map(e => Number(e.id)) +1)
     return {
-        id: crypto.randomUUID(),
+        id: nextId,
         title: "",
         date: "",
         description: "",
@@ -14,6 +17,7 @@ export function createEvent(overrides = {}) {
         startTime: DEFAULT_START_TIME,
         endTime: DEFAULT_END_TIME,
         setlistId: "",
+        eventId: null,
         ...overrides,
     }
 }
