@@ -21,10 +21,11 @@ export function ChannelsProvider({children}) {
             setLoading(false);
             return;
         }
+
         const memberSet = new Set(getStoredChannelsMembers().filter(m => m.userId === user.id).map(m => m.channelId));
         setUserChannelIds(memberSet);
 
-        const userChannels = getStoredChannels().filter(c => c.bandId === band.id && userChannelIds.has(c.id))
+        const userChannels = getStoredChannels().filter(c => c.bandId === band.id && memberSet.has(c.id))
         setChannels(userChannels);
         setLoading(false);
 
@@ -116,7 +117,7 @@ export function ChannelsProvider({children}) {
         saveStoredMessages(updatedMessages);
         setMessages(prev => prev.filter(m => m.channelId !== channelId));
 
-        if (activeChannelId === channelId) {
+        if (activeChannelId === channelId){
             setActiveChannelId(null);
         }
     }
