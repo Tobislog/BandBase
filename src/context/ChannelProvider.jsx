@@ -17,11 +17,12 @@ export function ChannelsProvider({children}) {
     useEffect(() => {
         if(!user?.id || !band?.id) {
             setChannels([]);
+            setUserChannelIds(new Set())
             setLoading(false);
             return;
         }
-
-        setUserChannelIds(new Set(getStoredChannelsMembers().filter(m => m.userId === user.id).map(m => m.channelId)));
+        const memberSet = new Set(getStoredChannelsMembers().filter(m => m.userId === user.id).map(m => m.channelId));
+        setUserChannelIds(memberSet);
 
         const userChannels = getStoredChannels().filter(c => c.bandId === band.id && userChannelIds.has(c.id))
         setChannels(userChannels);
@@ -30,6 +31,10 @@ export function ChannelsProvider({children}) {
     }, [user?.id, band?.id]);
 
     useEffect(() => {
+        if (!activeChannelId) {
+            setMessages([]);
+            return;
+        }
         const allMessages = getStoredMessages();
         setMessages(allMessages.filter(m => m.channelId === activeChannelId).sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
     }, [activeChannelId])

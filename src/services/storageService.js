@@ -39,7 +39,7 @@ export function getStoredBands () {
     const data = localStorage.getItem(BANDS_KEY);
     return data ? JSON.parse(data) : [];
 }
-export function setStoredBands (bands) {
+export function saveStoredBands (bands) {
     localStorage.setItem(BANDS_KEY, JSON.stringify(bands));
 }
 
@@ -48,7 +48,7 @@ export function getStoredMemberships () {
     const data = localStorage.getItem(MEMBERSHIPS_KEY);
     return data ? JSON.parse(data) : [];
 }
-export function setStoredMemberships (memberships) {
+export function saveStoredMemberships (memberships) {
     localStorage.setItem(MEMBERSHIPS_KEY, JSON.stringify(memberships));
 }
 
@@ -57,7 +57,7 @@ export function getStoredChannels () {
     const data = localStorage.getItem(CHANNELS_KEY);
     return data ? JSON.parse(data) : [];
 }
-export function setStoredChannels (channels) {
+export function saveStoredChannels (channels) {
     localStorage.setItem(CHANNELS_KEY, JSON.stringify(channels));
 }
 
@@ -66,7 +66,7 @@ export function getStoredChannelsMembers () {
     const data = localStorage.getItem(CHANNELS_MEMBERS_KEY);
     return data ? JSON.parse(data) : [];
 }
-export function setStoredChannelsMembers (members) {
+export function saveStoredChannelsMembers (members) {
     localStorage.setItem(MEMBERSHIPS_KEY, JSON.stringify(members));
 }
 
@@ -75,6 +75,6 @@ export function getStoredMessages () {
     const data = localStorage.getItem(MESSAGES_KEY);
     return data ? JSON.parse(data) : [];
 }
-export function setStoredMessages (messages) {
+export function saveStoredMessages (messages) {
     localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
 }
