@@ -90,8 +90,3 @@ src/
 └── main.jsx        App entry point
 ```
 
-## Notes
-
-- Dates are stored canonically as `YYYY-MM-DD` strings.
-- `docs/` contains internal notes on the events context and planned date
-  utilities (not part of the build).
