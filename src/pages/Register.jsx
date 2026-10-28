@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../services/authService";
+import { getStoredMemberships, saveStoredMemberships } from "../services/storageService";
+import { useBand } from "../context/BandProvider";
 
 export default function Register() {
+    const {bands} = useBand();
+    const defaultBand = bands[0];
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -25,7 +29,36 @@ export default function Register() {
         setSuccess('');
 
         try {
-            await registerUser(formData);
+            const data = await registerUser(formData);
+
+            if (!defaultBand?.id || data?.userId == null) {
+                throw new Error('Band-Zuordnung fehlgeschlagen.');
+            }
+
+            const allMemberships = getStoredMemberships();
+            const membership = {
+                userId: data.userId,
+                bandId: Number(defaultBand.id),
+                role: 'member',
+                createdAt: new Date().toISOString()
+            };
+            const alreadyMember = allMemberships.some(m =>
+              String(m.userId) === String(membership.userId) &&
+              String(m.bandId) === String(membership.bandId)
+            );
+
+            if (!alreadyMember) {
+              saveStoredMemberships([...allMemberships, membership]);
+            }
+
+            const saved = getStoredMemberships().some(m =>
+              String(m.userId) === String(membership.userId) &&
+              String(m.bandId) === String(membership.bandId)
+            );
+            if (!saved) {
+              throw new Error('Membership konnte nicht gespeichert werden.');
+            }
+
             setSuccess('Registrierung erfolgreich! Du wirst zum Login weitergeleitet...');
             // Nach 2 Sekunden automatisch zum Login weiterleiten
             setTimeout(() => {

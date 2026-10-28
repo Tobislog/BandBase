@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
-import { getStoredMemberships, getStoredBands } from "../services/storageService";
+import { getStoredMemberships, getStoredBands, saveStoredBands } from "../services/storageService";
 
 const BandContext = createContext(null);
 
@@ -8,11 +8,23 @@ export function BandProvider ({children}) {
     const { user } = useAuth();
     const [activeBandId, setActiveBandId] =  useState(1); // Hard-Coded, later Multi-Band-Support
     const [memberships, setMemberships] = useState([]);
-    const [bands, setBands] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [bands] = useState(() => {
+        const stored = getStoredBands();
+        if (stored.length > 0) return stored;
+
+        const seeded = [{
+            id: 1,
+            name: 'Band_01',
+            createdAt: new Date().toISOString(),
+        }]
+        saveStoredBands(seeded);
+        return seeded;
+    });
+
+
 
     useEffect(() => {
-        setBands(getStoredBands());
 
         if(!user?.id) {
             setMemberships([]);
@@ -21,12 +33,12 @@ export function BandProvider ({children}) {
         }
 
         const allMemberships = getStoredMemberships();
-        setMemberships(allMemberships.filter(m => m.userId === user.id));
+        setMemberships(allMemberships.filter(m => String(m.userId) === String(user.id)));
         setLoading(false);
     }, [user?.id]);
 
-    const band = bands.find(b => b.id === activeBandId) || { id: activeBandId, name:"Band_01", createdAt: "2026-10-27T12:27:00"};
-    const membership = memberships.find(m => m.bandId === activeBandId) || null;
+    const band = bands.find(b => String(b.id) === String(activeBandId)) ?? bands[0] ?? null;
+    const membership = memberships.find(m => String(m.bandId) === String(activeBandId)) ?? null;
     const role = membership?.role || null;
 
     const isOwner = role === "owner";
@@ -38,6 +50,7 @@ export function BandProvider ({children}) {
         <BandContext.Provider 
             value={{ 
                 band,
+                bands,
                 activeBandId,
                 setActiveBandId,
                 memberships,

@@ -6,10 +6,12 @@ import { useState } from "react";
 import EventModal from "../features/calendar/EventModal";
 import EventList from "../features/calendar/EventList";
 import { useEvent } from "../context/EventProvider";
+import { useBand } from "../context/BandProvider";
 
 export default function Calendar () {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { events, saveEvent, deleteEvent} = useEvent();
+    const { membership } = useBand();
     const [modalEvent, setModalEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -25,6 +27,7 @@ export default function Calendar () {
     }
 
     const handleDayClick = (dateString) => {
+        if (!membership) return;
         setModalEvent({ date: dateString });
         setIsModalOpen(true);
     }
@@ -35,6 +38,7 @@ export default function Calendar () {
     }
 
     const handleNewEventClick = () => {
+        if (!membership) return;
         setModalEvent(null);
         setIsModalOpen(true)
     }
@@ -44,11 +48,13 @@ export default function Calendar () {
             <PageHeading 
                 title="Calendar"
                 subtitle="Band schedule & event planning"
-                button={<BasicButton 
-                            title="New Event"
-                            icon={<CalendarPlus />}
-                            onClick={handleNewEventClick}
-                        />}
+                button={membership ? (
+                    <BasicButton 
+                        title="New Event"
+                        icon={<CalendarPlus />}
+                        onClick={handleNewEventClick}
+                    />
+                ) : null}
             />
             <div className="flex flex-row flex-wrap gap-6">
                 <CalendarWidget 

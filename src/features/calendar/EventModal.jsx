@@ -59,6 +59,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
 
     const handleSendMessage = (e) => {
         e.preventDefault();
+        if(!event?.channelId) return;
         if(!messageContent.trim()) return;
         sendMessage(event.channelId, messageContent);
         setMessageContent('');

@@ -6,9 +6,14 @@ import { useBand } from "./BandProvider";
 
 const ChannelsContext = createContext(null);
 
+const isEventChannelOfBand = (channel, bandid, isBandMember) =>
+    channel?.type === 'event'
+    && String(channel.bandId) === String(bandid)
+    && isBandMember;
+
 export function ChannelsProvider({children}) {
     const { user } = useAuth();
-    const { band }  = useBand();
+    const { band, membership }  = useBand();
     const [activeChannelId, setActiveChannelId] = useState(null);
     const [userChannelIds, setUserChannelIds] = useState(new Set());
     const [channels, setChannels] = useState([]);
@@ -23,15 +28,18 @@ export function ChannelsProvider({children}) {
             setLoading(false);
             return;
         }
+        const isBandMember = Boolean(membership);
 
-        const memberSet = new Set(getStoredChannelsMembers().filter(m => m.userId === user.id).map(m => m.channelId));
-        setUserChannelIds(memberSet);
+        const memberIds = new Set(getStoredChannelsMembers().filter(m => m.userId === user.id).map(m => m.channelId));
 
-        const userChannels = getStoredChannels().filter(c => c.bandId === band.id && memberSet.has(c.id))
+        const allChannels = getStoredChannels().filter(c => String(c.bandId) === String(band.id));
+        const userChannels = allChannels.filter(c => memberIds.has(String(c.id)) || isEventChannelOfBand(c, band.id, isBandMember));
+
+        setUserChannelIds(new Set(userChannels.map(c => String(c.id))));
         setChannels(userChannels);
         setLoading(false);
 
-    }, [user?.id, band?.id]);
+    }, [user?.id, band?.id, membership]);
 
 
     useEffect(() => {
@@ -75,7 +83,11 @@ export function ChannelsProvider({children}) {
     const sendMessage = (channelId, content) => {
         if (!user.id) return;
         if(!content.trim()) return;
-        if (!userChannelIds.has(channelId)) {
+
+        const channel = getStoredChannels().find(c => String(c.id) === String(channelId));
+        const hasAccess = userChannelIds.has(String(channelId)) || isEventChannelOfBand(channel, band.id, Boolean(membership));
+
+        if (!hasAccess) {
             throw new Error("User has no Permission")
         }
 
@@ -112,14 +124,7 @@ export function ChannelsProvider({children}) {
             createdBy: user.id,
             createdAt: new Date().toISOString(),
         }
-        const allChannelMembers = getStoredChannelsMembers();
-        const newMember = {
-            channelId: nextId,
-            userId: user.id
-        }  
-
         saveStoredChannels([...allChannels, newChannel]);
-        saveStoredChannelsMembers([...allChannelMembers, newMember]);
 
         setChannels(prev => [...prev, newChannel]);
         setUserChannelIds(prev => new Set([...prev, nextId]));

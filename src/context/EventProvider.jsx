@@ -11,15 +11,17 @@ const sortEvents = (events) => [...events].sort(compareEvents);
 
 
 export function EventProvider({children}) {
-    const { band } = useBand();
+    const { band, membership } = useBand();
     const [allEvents, setAllEvents] = useState(() =>
         sortEvents(getStoredEvents().map(e => ({ ...e, bandId: e.bandId ?? band.id })))
     );
     const { createEventChannel, deleteChannel, deleteEventChannels } = useChannels();
 
     const events = useMemo(
-        () => sortEvents(allEvents.filter(e => e.bandId === band.id)),
-        [allEvents, band.id]
+        () => membership
+            ? sortEvents(allEvents.filter(e => String(e.bandId) === String(band.id)))
+            : [],
+        [allEvents, band.id, membership]
     );
 
     useEffect(() => {
@@ -27,6 +29,8 @@ export function EventProvider({children}) {
     }, [allEvents]);
 
     const saveEvent = (savedEvent) => {
+        if (!membership) return;
+
         const normalizedEvent = normalizeEvent(savedEvent);
 
         const isExisting = normalizedEvent.id != null

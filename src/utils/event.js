@@ -23,7 +23,6 @@ export function createEvent(overrides = {}) {
         ...overrides,
     }
 }
-
 export function toEventForm(event) {
     return createEvent({
         ...event,
