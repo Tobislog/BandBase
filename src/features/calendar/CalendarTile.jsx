@@ -20,7 +20,7 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
         <>
             {day !== null ? (
                 <div 
-                    className="border  border-line h-25 p-1 hover:bg-line overflow-hidden cursor-pointer min-w-0 max-w-30"
+                    className="border  border-line h-25 p-1 hover:bg-line overflow-hidden cursor-pointer min-w-0"
                     onClick={() => onDayClick(dayKey)}
                 >
                     <div>

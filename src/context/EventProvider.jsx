@@ -1,34 +1,50 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { saveStoredEvents, getStoredEvents } from "../services/storageService";
 import { compareEvents } from "../utils/date";
 import { normalizeEvent, getNextEventId } from "../utils/event"
 import { useChannels } from "./ChannelProvider";
+import { useBand } from "./BandProvider";
 
 const EventContext = createContext(null);
 
 const sortEvents = (events) => [...events].sort(compareEvents);
 
+
 export function EventProvider({children}) {
-    const [events, setEvents] = useState(() => sortEvents(getStoredEvents()));
-    const { createEventChannel, deleteChannel } = useChannels();
-    
+    const { band } = useBand();
+    const [allEvents, setAllEvents] = useState(() =>
+        sortEvents(getStoredEvents().map(e => ({ ...e, bandId: e.bandId ?? band.id })))
+    );
+    const { createEventChannel, deleteChannel, deleteEventChannels } = useChannels();
+
+    const events = useMemo(
+        () => sortEvents(allEvents.filter(e => e.bandId === band.id)),
+        [allEvents, band.id]
+    );
+
     useEffect(() => {
-        saveStoredEvents(events);
-    }, [events]);
+        saveStoredEvents(allEvents);
+    }, [allEvents]);
 
     const saveEvent = (savedEvent) => {
         const normalizedEvent = normalizeEvent(savedEvent);
 
-        const isExisting = normalizedEvent.id !== null
-            && events.some(e => e.id === normalizedEvent.id);
+        const isExisting = normalizedEvent.id != null
+            && allEvents.some(e => e.id === normalizedEvent.id);
 
-        const eventToSave = isExisting ? normalizedEvent : {...normalizedEvent, id: getNextEventId(events)};
+        const eventToSave = isExisting
+            ? normalizedEvent
+            : {
+                ...normalizedEvent,
+                id: getNextEventId(allEvents),
+                bandId: normalizedEvent.bandId ?? band.id,
+            };
 
         if(!eventToSave.channelId) {
             eventToSave.channelId = createEventChannel(eventToSave);
         }
 
-        setEvents(prev =>
+        setAllEvents(prev =>
             sortEvents(
                 isExisting
                     ? prev.map(e => e.id === eventToSave.id ? eventToSave : e)
@@ -38,11 +54,12 @@ export function EventProvider({children}) {
     };
 
     const deleteEvent = (id) => {
-        const eventToDelete = events.find(e => e.id === id);
-        if (eventToDelete?.channelId) {
+        const eventToDelete = allEvents.find(e => e.id === id);
+        if (eventToDelete?.channelId != null) {
             deleteChannel(eventToDelete.channelId);
         }
-        setEvents(prev => prev.filter(e => e.id !== id));
+        deleteEventChannels(id);
+        setAllEvents(prev => prev.filter(e => e.id !== id));
     };
 
 

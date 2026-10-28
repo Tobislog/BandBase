@@ -3,13 +3,15 @@ import { addHoursToTime } from "./date";
 export const DEFAULT_START_TIME = '19:00';
 export const DEFAULT_END_TIME = '21:00';
 
-export function getNextEventId(events) {
-    return events.length === 0 ? 1 : Math.max(...events.map(e => Number(e.id))) + 1;
+export function getNextEventId(allEvents) {
+    const ids = allEvents.map(e => Number(e.id)).filter(Number.isFinite);
+    return ids.length === 0 ? 1 : Math.max(...ids) + 1;
 }
 
 export function createEvent(overrides = {}) {
     return {
         id: null,
+        bandId: null,
         title: "",
         date: "",
         description: "",

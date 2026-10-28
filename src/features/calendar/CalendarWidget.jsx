@@ -55,17 +55,17 @@ export default function CalendarWidget ({events, onOpenEvent, onDayClick, curren
             </div>
             <BasicTile>
                 {/* Title-Row, Day-Names */}
-                <div className="grid grid-cols-7">
+                <div className="grid grid-cols-[repeat(7,minmax(0,7.5rem))]">
                     {weekDays.map((day, index) => (
                         <div 
                             key={index}
-                            className="pl-2 border border-line"
+                            className="pl-2 pr-2 border border-line"
                         >
                             {day}
                         </div>
                     ))}
                 </div>
-                <div className="grid grid-cols-7">
+                <div className="grid grid-cols-[repeat(7,minmax(0,7.5rem))]">
                     {calendarCells.map((day, index) => (
                         <CalendarTile 
                             key={index}

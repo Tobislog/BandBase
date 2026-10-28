@@ -126,32 +126,47 @@ export function ChannelsProvider({children}) {
         return nextId;
     }
 
-    const deleteChannel = (channelId) => {
-        if(!channelId) return;
+    const deleteChannels = (channelIds) => {
+        const idsToDelete = new Set(
+            (channelIds ?? []).filter(id => id != null).map(String)
+        );
+        if (idsToDelete.size === 0) return;
 
         const allChannels = getStoredChannels();
-        const updatedChannels = allChannels.filter(c => c.id !== channelId);
-        saveStoredChannels(updatedChannels);
-        setChannels(prev => prev.filter(c => c.id !== channelId));
+        saveStoredChannels(allChannels.filter(c => !idsToDelete.has(String(c.id))));
+        setChannels(prev => prev.filter(c => !idsToDelete.has(String(c.id))));
 
         setUserChannelIds(prev => {
             const next = new Set(prev);
-            next.delete(channelId);
+            next.forEach(id => {
+                if (idsToDelete.has(String(id))) next.delete(id);
+            });
             return next;
-        })
+        });
 
         const allMembers = getStoredChannelsMembers();
-        const updatedMembers = allMembers.filter(m => m.channelId !== channelId);
-        saveStoredChannelsMembers(updatedMembers);
+        saveStoredChannelsMembers(allMembers.filter(m => !idsToDelete.has(String(m.channelId))));
 
         const allMessages = getStoredMessages();
-        const updatedMessages = allMessages.filter(m => m.channelId !== channelId);
-        saveStoredMessages(updatedMessages);
-        setMessages(prev => prev.filter(m => m.channelId !== channelId));
+        saveStoredMessages(allMessages.filter(m => !idsToDelete.has(String(m.channelId))));
+        setMessages(prev => prev.filter(m => !idsToDelete.has(String(m.channelId))));
 
-        if (activeChannelId === channelId){
+        if (activeChannelId != null && idsToDelete.has(String(activeChannelId))) {
             setActiveChannelId(null);
         }
+    }
+
+    const deleteChannel = (channelId) => {
+        if (channelId == null) return;
+        deleteChannels([channelId]);
+    }
+
+    const deleteEventChannels = (eventId) => {
+        if (eventId == null) return;
+        const channelIds = getStoredChannels()
+            .filter(c => String(c.eventId) === String(eventId))
+            .map(c => c.id);
+        deleteChannels(channelIds);
     }
 
     return (
@@ -160,6 +175,7 @@ export function ChannelsProvider({children}) {
                 channels,
                 createEventChannel,
                 deleteChannel,
+                deleteEventChannels,
                 activeChannelId,
                 setActiveChannelId,
                 messages,
