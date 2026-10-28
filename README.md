@@ -19,28 +19,53 @@ events, organizing setlists and songs, and keeping the band in sync.
 
 ## Tech stack
 
+**Frontend:**
 - [React 19](https://react.dev/) with React Router
 - [Vite](https://vite.dev/) for development and builds
 - [Tailwind CSS 4](https://tailwindcss.com/) with a custom theme
 - [lucide-react](https://lucide.dev/) icons
 - ESLint for linting
 
+**Backend:**
+- Node.js & Express
+- SQLite (via `users.db` / `db.js`)
+
 ## Getting started
 
 Requirements: Node.js 20+ and npm.
 
+### 1. Install dependencies
+
+Since the Project contains both frontend and backend, you need to install the dependencies for both parts:
+
 ```bash
+# Install frontend dependencies (in root directory)
 npm install
+
+# install backend dependencies
+cd backend
+npm install
+cd ..
+```
+
+### 2. Running the Application
+
+Start both the backend and the frontend in seperate terminal windows:
+
+**Backend (Port 3000)**
+```bash
+cd backend
+node server.js
+```
+**Frontend (Port 5173)**
+```bash
+# In the root directory
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`.
+The frontend app runs at `http://localhost:5173` and communicates with the backend at `http://localhos:3000/api`.
 
-Authentication expects a backend at `http://localhost:3000/api` providing
-`/login`, `/logout`, `/me`, and `/register`. Calendar events, setlists, and
-songs are currently persisted in `localStorage`.
-
-## Scripts
+## Scripts (Frontend)
 
 | Command           | Description                  |
 | ----------------- | ---------------------------- |
