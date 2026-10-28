@@ -20,7 +20,6 @@ export function createEvent(overrides = {}) {
         startTime: DEFAULT_START_TIME,
         endTime: DEFAULT_END_TIME,
         setlistId: "",
-        eventId: null,
         ...overrides,
     }
 }
