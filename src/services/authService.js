@@ -61,3 +61,18 @@ export async function registerUser(userData) {
     return data;
 }
 
+export async function getUsersBatch(userIds) {
+    const response = await fetch(`${API_URL}/users/batch`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}, 
+        credentials: 'include',
+        body: JSON.stringify({userIds}),
+    });
+    
+    if (!response.ok) {
+        throw new Error("Fehler beim Batch-Laden der User")
+    }
+
+    return await response.json();
+}
+

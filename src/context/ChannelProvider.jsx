@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getStoredChannels, getStoredChannelsMembers, saveStoredChannelsMembers, getStoredMessages, saveStoredChannels, saveStoredMessages } from "../services/storageService";
+import { getUsersBatch } from "../services/authService";
 import { useAuth } from "./AuthProvider";
 import { useBand } from "./BandProvider";
 
@@ -12,6 +13,7 @@ export function ChannelsProvider({children}) {
     const [userChannelIds, setUserChannelIds] = useState(new Set());
     const [channels, setChannels] = useState([]);
     const [messages, setMessages] = useState([]);
+    const [userCache, setUserCache] = useState({}); // Format: {[userID]: "Vorname Nachname"}
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,6 +33,7 @@ export function ChannelsProvider({children}) {
 
     }, [user?.id, band?.id]);
 
+
     useEffect(() => {
         if (!activeChannelId) {
             setMessages([]);
@@ -39,6 +42,35 @@ export function ChannelsProvider({children}) {
         const allMessages = getStoredMessages();
         setMessages(allMessages.filter(m => m.channelId === activeChannelId).sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
     }, [activeChannelId])
+
+    useEffect(() => {
+        const missingIds = [...new Set(
+            messages
+                .map(m => m.userId)
+                .filter(id => id && !userCache[id])
+        )]
+
+        if (missingIds.length === 0) return;
+
+        const fetchUserNames = async () => {
+            try {
+                const users = await getUsersBatch(missingIds);
+                if (!users || !Array.isArray(users)) return;
+
+                setUserCache(prev => {
+                    const updated = {...prev};
+                    users.forEach(u => {
+                        const fullName = `${u.first_name || ''} ${u.last_name || ''}`.trim();
+                        updated[u.id] = fullName || u.email; // Fallback if no fullName
+                    })
+                    return updated;
+                });
+            } catch (error) {
+                console.error("Konnte Usernamen für den Chat nicht laden: ", error)
+            }
+        }
+        fetchUserNames();
+    }, [messages])
 
     const sendMessage = (channelId, content) => {
         if (!user.id) return;
@@ -122,7 +154,6 @@ export function ChannelsProvider({children}) {
         }
     }
 
-
     return (
         <ChannelsContext.Provider
             value={{
@@ -133,6 +164,7 @@ export function ChannelsProvider({children}) {
                 setActiveChannelId,
                 messages,
                 sendMessage,
+                userCache,
                 loading
             }}>
                 {children}
