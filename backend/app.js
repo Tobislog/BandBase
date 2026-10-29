@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import authRouter from './routes/auth.js'
+import bandsRouter from './routes/bands.js'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -15,7 +16,8 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api', authRouter);
-app.use(notFoundHandler)
-app.use(errorHandler)
+app.use('/api/bands', bandsRouter);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;

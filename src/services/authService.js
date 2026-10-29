@@ -1,78 +1,42 @@
-const API_URL = 'http://localhost:3000/api';
+import { apiRequest } from "./apiClient";
 
 export async function loginUser(email, password) {
-    const response = await fetch(`${API_URL}/login`, {
+    const data = await apiRequest('/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({ email, password}),
+        body: {email, password},
+        authEvent: false,
     });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.error || "Login Fehlgeschlagen");
-    }
-
-    return data;
-}
-
-export async function logoutUser() {
-    const response = await fetch(`${API_URL}/logout`, {
-        method: 'POST',
-        credentials: 'include'
-    });
-
-    if (!response.ok) {
-        throw new Error('Logout fehlgeschlagen');
-    }
-
-    return await response.json();
-}
-
-export async function getCurrentUser() {
-    const response = await fetch(`${API_URL}/me`, {
-        method: 'GET',
-        credentials: 'include',
-    });
-    
-    if (!response.ok) {
-        return null
-    }
-
-    const data = await response.json();
     return data.user;
 }
 
-export async function registerUser(userData) {
-    // userData is an Object: { email, password, firstName, lastName, color, role }
-    const response = await fetch(`${API_URL}/register`, {
+export async function logoutUser() {
+    await apiRequest('/logout', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(userData),
+        authEvent: false,
     });
+}
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.error || "Registrierung fehlgeschlagen");
+export async function getCurrentUser() {
+    try {
+        const data = await apiRequest('/me', { authEvent: false });
+        return data.user;
+    } catch (err) {
+        if (err.status === 401) return null;
+        throw err;
     }
+}
 
-    return data;
+export async function registerUser(userData) {
+    return apiRequest('/register', {
+        method: 'POST',
+        body: userData,
+        authEvent: false,
+    });
 }
 
 export async function getUsersBatch(userIds) {
-    const response = await fetch(`${API_URL}/users/batch`, {
+    return apiRequest('/users/batch', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'}, 
-        credentials: 'include',
-        body: JSON.stringify({userIds}),
+        body: { userIds },
     });
-    
-    if (!response.ok) {
-        throw new Error("Fehler beim Batch-Laden der User")
-    }
-
-    return await response.json();
 }
-

@@ -11,7 +11,7 @@ import { useBand } from "../context/BandProvider";
 export default function Calendar () {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { events, saveEvent, deleteEvent} = useEvent();
-    const { membership } = useBand();
+    const { canManage } = useBand();
     const [modalEvent, setModalEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -27,7 +27,7 @@ export default function Calendar () {
     }
 
     const handleDayClick = (dateString) => {
-        if (!membership) return;
+        if (!canManage) return;
         setModalEvent({ date: dateString });
         setIsModalOpen(true);
     }
@@ -38,7 +38,7 @@ export default function Calendar () {
     }
 
     const handleNewEventClick = () => {
-        if (!membership) return;
+        if (!canManage) return;
         setModalEvent(null);
         setIsModalOpen(true)
     }
@@ -48,7 +48,7 @@ export default function Calendar () {
             <PageHeading 
                 title="Calendar"
                 subtitle="Band schedule & event planning"
-                button={membership ? (
+                button={canManage ? (
                     <BasicButton 
                         title="New Event"
                         icon={<CalendarPlus />}

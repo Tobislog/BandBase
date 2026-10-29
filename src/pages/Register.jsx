@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../services/authService";
-import { getStoredMemberships, saveStoredMemberships } from "../services/storageService";
-import { useBand } from "../context/BandProvider";
 
 export default function Register() {
-    const {bands} = useBand();
-    const defaultBand = bands[0];
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         firstName: '',
         lastName: '',
-        color: '#3b82f6',
-        role: 'user'
+        color: '#3b82f6'
     })
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -29,42 +24,17 @@ export default function Register() {
         setSuccess('');
 
         try {
-            const data = await registerUser(formData);
+            const { membership } = await registerUser(formData);
 
-            if (!defaultBand?.id || data?.userId == null) {
-                throw new Error('Band-Zuordnung fehlgeschlagen.');
-            }
-
-            const allMemberships = getStoredMemberships();
-            const membership = {
-                userId: data.userId,
-                bandId: Number(defaultBand.id),
-                role: 'member',
-                createdAt: new Date().toISOString()
-            };
-            const alreadyMember = allMemberships.some(m =>
-              String(m.userId) === String(membership.userId) &&
-              String(m.bandId) === String(membership.bandId)
-            );
-
-            if (!alreadyMember) {
-              saveStoredMemberships([...allMemberships, membership]);
-            }
-
-            const saved = getStoredMemberships().some(m =>
-              String(m.userId) === String(membership.userId) &&
-              String(m.bandId) === String(membership.bandId)
-            );
-            if (!saved) {
-              throw new Error('Membership konnte nicht gespeichert werden.');
+            if(!membership?.bandId) {
+              throw new Error('Band-assignment failed.');
             }
 
             setSuccess('Registrierung erfolgreich! Du wirst zum Login weitergeleitet...');
-            // Nach 2 Sekunden automatisch zum Login weiterleiten
+            
             setTimeout(() => {
-                navigate('/login');
+              navigate('/login');
             }, 2000);
-
         } catch (err) {
             setError(err.message);
         }
@@ -118,11 +88,12 @@ export default function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Passwort (min. 6 Zeichen)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Passwort (min. 8 Zeichen)</label>
                 <input 
                   type="password" 
                   name="password"
                   value={formData.password}
+                  minLength={8}
                   onChange={handleChange}
                   required
                   autoComplete="new-password"
@@ -140,20 +111,6 @@ export default function Register() {
                     onChange={handleChange}
                     className="w-full h-10 p-1 border border-gray-300 rounded-md cursor-pointer"
                   />
-                </div>
-
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rolle</label>
-                  <select 
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    <option value="user">User</option>
-                    <option value="moderator">Moderator</option>
-                    <option value="admin">Admin</option>
-                  </select>
                 </div>
               </div>
 

@@ -40,7 +40,7 @@ export default function Home () {
     return (
         <div>
             <PageHeading 
-                title={`Hallo, ${user.first_name}!`} 
+                title={`Hallo, ${user?.firstName ?? ''}!`} 
                 subtitle={`Heute ist ${today.toLocaleDateString('de-DE', dateOptions)}. Hier siehst du, was für die Band ansteht.`}
             />
             <div className="flex flex-row gap-6 flex-wrap">

@@ -1,8 +1,6 @@
 const SETLISTS_KEY = 'bandbase_setlists';
 const SONGS_KEY = 'bandbase_songs';
 const EVENTS_KEY = 'bandbase_events';
-const BANDS_KEY = 'bandbase_bands'
-const MEMBERSHIPS_KEY = 'bandbase_band_memberships';
 const CHANNELS_KEY = 'bandbase_channels';
 const CHANNELS_MEMBERS_KEY = 'bandbase_channel_members';
 const MESSAGES_KEY = 'bandbase_messages';
@@ -32,24 +30,6 @@ export function getStoredEvents() {
 }
 export function saveStoredEvents(events) {
     localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
-}
-
-// Bands
-export function getStoredBands () {
-    const data = localStorage.getItem(BANDS_KEY);
-    return data ? JSON.parse(data) : [];
-}
-export function saveStoredBands (bands) {
-    localStorage.setItem(BANDS_KEY, JSON.stringify(bands));
-}
-
-// Memberships
-export function getStoredMemberships () {
-    const data = localStorage.getItem(MEMBERSHIPS_KEY);
-    return data ? JSON.parse(data) : [];
-}
-export function saveStoredMemberships (memberships) {
-    localStorage.setItem(MEMBERSHIPS_KEY, JSON.stringify(memberships));
 }
 
 // Channels

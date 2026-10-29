@@ -10,13 +10,22 @@ import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthProvider';
 import { EventProvider } from './context/EventProvider';
-import { BandProvider } from './context/BandProvider';
+import { BandProvider, useBand } from './context/BandProvider';
 import { ChannelsProvider } from './context/ChannelProvider';
 
 
 
 function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { loading: bandLoading} = useBand();
+
+  if (bandLoading) {
+    return (
+      <div className='flex h-screen items-center justify-center bg-surface text-copy'>
+        <p>Lade Band...</p>
+      </div>
+    );
+  }
 
   const toggleSidebar = () => {
     setIsSidebarOpen(prev => !prev);

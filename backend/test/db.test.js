@@ -12,7 +12,7 @@ after (async () => {
     await ctx.cleanup();
 })
 
-test('migration sets user_version, enables foreign kexs and seeds Band_01 once', async () => {
+test('migration sets user_version, enables foreign keys and seeds Band_01 once', async () => {
     const version = await ctx.db.get('PRAGMA user_version');
     const foreignKeys =  await ctx.db.get('PRAGMA foreign_keys');
     const bands = await ctx.db.all('SELECT id, name FROM bands WHERE name = "Band_01"');

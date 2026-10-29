@@ -8,22 +8,35 @@ export function AuthProvider({children}) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
+
         getCurrentUser()
-            .then((userData) => setUser(userData))
-            .catch(() => setUser(null))
-            .finally(() => setLoading(false))
+            .then((userData) => { if(!cancelled) setUser(userData);})
+            .catch(() => { if(!cancelled) setUser(null);})
+            .finally(() => { if(!cancelled) setLoading(false);});
+            return () => cancelled = true;
+    }, []);
+
+    useEffect(() => {
+        const handleUnauthorized = () => setUser(null);
+        window.addEventListener('auth:unauthorized', handleUnauthorized);
+        return () => {
+            window.removeEventListener('auth:unauthorized', handleUnauthorized);
+        };
     }, []);
 
     const login = async (email, password) => {
-        await loginUser(email, password);
-        const userData = await getCurrentUser();
+        const userData = await loginUser(email, password);
         setUser(userData);
     }
 
     const logout = async () => {
-        await logoutUser();
-        setUser(null);
-    }
+        try {
+            await logoutUser();
+        } finally {
+            setUser(null);
+        }
+    };
 
     return (
         <AuthContext.Provider value={{ user, login, logout, loading}}>
@@ -33,5 +46,9 @@ export function AuthProvider({children}) {
 }
 
 export function useAuth() {
-    return useContext(AuthContext);
+    const ctx = useContext(AuthContext);
+    if (!ctx) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return ctx;
 }

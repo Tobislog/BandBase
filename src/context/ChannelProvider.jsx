@@ -78,10 +78,10 @@ export function ChannelsProvider({children}) {
             }
         }
         fetchUserNames();
-    }, [messages])
+    }, [messages, userCache])
 
     const sendMessage = (channelId, content) => {
-        if (!user.id) return;
+        if (!user.id || !band?.id) return;
         if(!content.trim()) return;
 
         const channel = getStoredChannels().find(c => String(c.id) === String(channelId));
@@ -110,7 +110,7 @@ export function ChannelsProvider({children}) {
     }
 
     const createEventChannel = (event) => {
-        if(!user?.id || !band.id) return null;
+        if(!user?.id || !band?.id) return null;
 
         const allChannels = getStoredChannels();
         const nextId = allChannels.length === 0 ? 1 : Math.max(...allChannels.map(m => Number(m.id))) +1;
