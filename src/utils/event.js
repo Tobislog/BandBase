@@ -15,7 +15,7 @@ export function createEvent(overrides = {}) {
         title: "",
         date: "",
         description: "",
-        category: "Other",
+        category: "other",
         meetupTime: "", // In Formular Strings, on Save null
         startTime: DEFAULT_START_TIME,
         endTime: DEFAULT_END_TIME,

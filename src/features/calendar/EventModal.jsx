@@ -154,9 +154,9 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                 onChange={handleChange}
                                 className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand bg-surface"
                             >
-                                <option value="Rehearsal">Rehearsal</option>
-                                <option value="Gig">Gig</option>
-                                <option value="Other">Other</option>
+                                <option value="rehearsal">Rehearsal</option>
+                                <option value="gig">Gig</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
                         <div>

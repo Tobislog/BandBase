@@ -10,8 +10,8 @@ export default function CalendarTile ({ day, events , onOpenEvent, onDayClick}) 
     
     const getCategoryColor = (category) => {
         switch (category) {
-            case 'Rehearsal': return 'bg-rehearsal/20 text-rehearsal';
-            case 'Gig': return 'bg-gig/20 text-gig';
+            case 'rehearsal': return 'bg-rehearsal/20 text-rehearsal';
+            case 'gig': return 'bg-gig/20 text-gig';
             default: return 'bg-brand/20 text-brand';
         }
     }
