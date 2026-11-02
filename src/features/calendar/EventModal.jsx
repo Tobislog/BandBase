@@ -51,7 +51,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
         if (!canManage) return;
 
         if (!form.title || !form.date || !form.startTime) {
-            alert("Please set Title, Date and Start time!");
+            setError('Bitte Titel, Datum und Anfangszeit setzen.');
             return;
         }
 
@@ -62,7 +62,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
             await onSave(form);
             onClose();
         } catch (err) {
-            setError(err.mesage || 'Event konnte nicht gespeichert werden.');
+            setError(err.message || 'Event konnte nicht gespeichert werden.');
             setSaving(false);
         }
     };

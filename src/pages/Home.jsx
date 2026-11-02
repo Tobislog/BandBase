@@ -23,7 +23,7 @@ const getNextEvent = (events, now = new Date()) => {
 export default function Home () {
     const navigate = useNavigate();
     const {user} = useAuth();
-    const {events} = useEvent();
+    const {events, loading: eventsLoading, error: eventsError } = useEvent();
     const today = new Date();
     const nextEvent = getNextEvent(events);
     const dateOptions = {
@@ -54,13 +54,18 @@ export default function Home () {
                     />}
                 >
                     <div className="p-2 min-w-100">
-                        {nextEvent ? (
+                        {eventsLoading ? (
+                            <div className="p-2">Lade Termine...</div>
+                        ) : eventsError ? (
+                            <div className="p-2 text-sm text-red-500">{eventsError}</div>
+                        ) : nextEvent ? (
                             <EventListItem event={nextEvent} onClick={onEventClick}/>
                         ) : (
                             <div className="p-2">Keine Termine geplant.</div>
                         )}
                     </div>
                 </BasicTile>
+                
                 <BasicTile
                     title="Offene Aufgaben"
                     icon={<ClipboardList />}

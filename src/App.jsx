@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
-
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
+import BasicButton from './components/BasicButton'
 import { NAV_ITEMS } from './config/navigation';
-
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -17,12 +16,31 @@ import { ChannelsProvider } from './context/ChannelProvider';
 
 function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { loading: bandLoading} = useBand();
+  const { loading: bandLoading, error: bandError} = useBand();
 
   if (bandLoading) {
     return (
       <div className='flex h-screen items-center justify-center bg-surface text-copy'>
         <p>Lade Band...</p>
+      </div>
+    );
+  }
+
+  if (bandError) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-surface p-6 text-copy">
+        <div className="max-w-md rounded-xl border border-red-500/40 bg-red-400/10 p-6 text-center">
+          <h1 className="mb-2 text-lg font-semibold">
+            Band konnte nicht geladen werden
+          </h1>
+          <p className="mb-4 text-sm text-red-500">
+            {bandError}
+          </p>
+          <BasicButton
+            title="Erneut laden"
+            onClick={() => window.location.reload()}
+          />
+        </div>
       </div>
     );
   }
