@@ -186,6 +186,9 @@ test('members can read and write messages but cannot create events', async () =>
 
     const memberAgent = await loginAs(memberData);
 
+    const memberChannels = await getChannels(memberAgent, bandId);
+    assert.ok(memberChannels.some((channel) => channel.id === event.channelId));
+
     const forbidden = await memberAgent
         .post(`/api/bands/${bandId}/events`)
         .send(eventPayload({ title: 'Forbidden' }));
@@ -305,6 +308,84 @@ test('custom channel access follows role and channel membership rules', async ()
     );
 
     assert.equal((await moderatorAgent.get(`/api/channels/${customId}/messages`)).status, 200);
+});
+
+test('recent band messages respect channel access, ordering and limit', async () => {
+    const owner = await register(ownerData);
+    const member = await register(memberData);
+    const bandId = owner.membership.bandId;
+
+    const ownerAgent = await loginAs(ownerData);
+    const eventA = await createEvent(ownerAgent, bandId, { title: 'Event A' });
+    const eventB = await createEvent(ownerAgent, bandId, { title: 'Event B' });
+
+    const memberChannel = await ctx.db.run(
+        `INSERT INTO channels (band_id, type, event_id, name, created_by)
+         VALUES (?, 'custom', NULL, 'Member Channel', ?)`,
+        [bandId, owner.user.id]
+    );
+    await ctx.db.run(
+        'INSERT INTO channel_members (channel_id, user_id) VALUES (?, ?)',
+        [memberChannel.lastID, member.user.id]
+    );
+
+    const hiddenChannel = await ctx.db.run(
+        `INSERT INTO channels (band_id, type, event_id, name, created_by)
+         VALUES (?, 'custom', NULL, 'Hidden Channel', ?)`,
+        [bandId, owner.user.id]
+    );
+
+    const otherBandId = await createBand('Other Band', owner.user.id);
+    const otherEvent = await createEvent(ownerAgent, otherBandId, { title: 'Other Event' });
+
+    const send = async (channelId, content) => {
+        const res = await ownerAgent
+            .post(`/api/channels/${channelId}/messages`)
+            .send({ content });
+        assert.equal(res.status, 201, JSON.stringify(res.body));
+    };
+
+    await send(eventA.channelId, 'Älteste');
+    await send(memberChannel.lastID, 'Mitte');
+    await send(hiddenChannel.lastID, 'Versteckt');
+    await send(eventB.channelId, 'Neueste');
+    await send(otherEvent.channelId, 'Fremde Band');
+
+    const memberAgent = await loginAs(memberData);
+    const memberRes = await memberAgent.get(`/api/bands/${bandId}/messages?limit=3`);
+
+    assert.equal(memberRes.status, 200, JSON.stringify(memberRes.body));
+    assert.deepEqual(
+        memberRes.body.messages.map((message) => message.content),
+        ['Neueste', 'Mitte', 'Älteste']
+    );
+    assert.deepEqual(
+        memberRes.body.messages.map((message) => message.channelName),
+        ['Event B', 'Member Channel', 'Event A']
+    );
+    assert.deepEqual(
+        memberRes.body.messages.map((message) => message.channelType),
+        ['event', 'custom', 'event']
+    );
+    assert.equal(memberRes.body.messages[0].author.firstName, 'Ada');
+    assert.equal(memberRes.body.messages[1].channelEventId, null);
+
+    const ownerRes = await ownerAgent.get(`/api/bands/${bandId}/messages?limit=10`);
+
+    assert.equal(ownerRes.status, 200, JSON.stringify(ownerRes.body));
+    assert.deepEqual(
+        ownerRes.body.messages.map((message) => message.content),
+        ['Neueste', 'Versteckt', 'Mitte', 'Älteste']
+    );
+
+    const limitedRes = await ownerAgent.get(`/api/bands/${bandId}/messages?limit=2`);
+    assert.deepEqual(
+        limitedRes.body.messages.map((message) => message.content),
+        ['Neueste', 'Versteckt']
+    );
+
+    const invalidLimit = await ownerAgent.get(`/api/bands/${bandId}/messages?limit=0`);
+    assert.equal(invalidLimit.status, 400);
 });
 
 test('non-members cannot access band event lists', async () => {

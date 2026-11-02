@@ -10,6 +10,11 @@ export async function getMessages(channelId) {
     return data.messages;
 }
 
+export async function getRecentMessages(bandId, limit = 5) {
+    const data = await apiRequest(`/bands/${bandId}/messages?limit=${limit}`);
+    return data.messages;
+}
+
 export async function sendMessage(channelId, content) {
     const data = await apiRequest(`/channels/${channelId}/messages`, {
         method: 'POST',

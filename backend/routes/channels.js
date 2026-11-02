@@ -6,6 +6,9 @@ import { requireChannelAccess } from '../middleware/channelAccess.js';
 import { HttpError } from '../utils/httpError.js';
 import { isValidMessageContent } from '../utils/validation.js';
 
+const DEFAULT_RECENT_MESSAGE_LIMIT = 5;
+const MAX_RECENT_MESSAGE_LIMIT = 20;
+
 const router = Router();
 router.use(requireAuth);
 
@@ -30,6 +33,18 @@ const MESSAGE_FIELDS = `
     u.last_name AS authorLastName,
     u.color AS authorColor
 `;
+
+function parseRecentMessageLimit(value) {
+    const limit = value === undefined
+        ? DEFAULT_RECENT_MESSAGE_LIMIT
+        : Number(value);
+
+    if (!Number.isInteger(limit) || limit < 1 || limit > MAX_RECENT_MESSAGE_LIMIT) {
+        throw new HttpError(400, 'Invalid message limit');
+    }
+
+    return limit;
+}
 
 function toMessage(row) {
     const {
@@ -59,7 +74,7 @@ router.get('/bands/:bandId/channels', requireBandMember, async (req, res) => {
         FROM channels c
         WHERE c.band_id = ?
         AND (
-            c.type = 'event)'
+            c.type = 'event'
             OR ? IN ('owner', 'admin')
             OR EXISTS (
                 SELECT 1
@@ -71,6 +86,36 @@ router.get('/bands/:bandId/channels', requireBandMember, async (req, res) => {
         [req.bandId, role, req.user.id]
     );
     res.json({ channels });
+});
+
+router.get('/bands/:bandId/messages', requireBandMember, async (req, res) => {
+    const limit = parseRecentMessageLimit(req.query.limit);
+    const role = req.bandMembership.role;
+
+    const rows = await all(
+        `SELECT ${MESSAGE_FIELDS},
+                c.name AS channelName,
+                c.type AS channelType,
+                c.event_id AS channelEventId
+         FROM messages m
+         JOIN users u ON u.id = m.user_id
+         JOIN channels c ON c.id = m.channel_id
+         WHERE c.band_id = ?
+           AND (
+               c.type = 'event'
+               OR ? IN ('owner', 'admin')
+               OR EXISTS (
+                   SELECT 1
+                   FROM channel_members cm
+                   WHERE cm.channel_id = c.id AND cm.user_id = ?
+               )
+           )
+         ORDER BY m.created_at DESC, m.id DESC
+         LIMIT ?`,
+        [req.bandId, role, req.user.id, limit]
+    );
+
+    res.json({ messages: rows.map(toMessage) });
 });
 
 router.get('/channels/:channelId/messages', requireChannelAccess, async (req, res) => {
