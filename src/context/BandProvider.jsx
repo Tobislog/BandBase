@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import { getBands } from "../services/bandService";
 
@@ -53,6 +53,28 @@ export function BandProvider ({children}) {
         };
     }, [user?.id]);
 
+    const refreshBands = useCallback(async () => {
+        if (!user?.id) {
+            setBands([]);
+            setSelectedBandId(null);
+            setError('');
+            return [];
+        }
+
+        try {
+            const nextBands = await getBands();
+            setBands(nextBands);
+            setSelectedBandId((current) => (
+                nextBands.some((band) => band.id === current) ? current : nextBands[0]?.id ?? null
+            ));
+            setError('');
+            return nextBands;
+        } catch (err) {
+            setError(err.message || 'Bands loading error.');
+            return [];
+        }
+    }, [user?.id]);
+
     const activeBandId = bands.some((band) => band.id === selectedBandId) ? selectedBandId : bands[0]?.id ?? null;
     const memberships = useMemo(() => bands.map((band) => ({
         bandId: band.id,
@@ -77,6 +99,7 @@ export function BandProvider ({children}) {
         isAdmin: role === 'admin' || role === 'owner',
         isModerator: role === 'moderator' || role === 'admin' || role === 'owner',
         canManage: ['owner', 'admin', 'moderator'].includes(role),
+        refreshBands,
         loading,
         error
     }), [
@@ -86,6 +109,7 @@ export function BandProvider ({children}) {
         memberships,
         membership,
         role,
+        refreshBands,
         loading,
         error,        
     ]);

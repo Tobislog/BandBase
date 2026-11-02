@@ -18,6 +18,9 @@ events, organizing setlists and songs, and keeping the band in sync.
 - **Setlists & song library** – Create setlists, manage a song archive, add
   songs, notes and pauses, reorder items and edit song details.
 - **Messenger** – Placeholder page for future non-event channels.
+- **Members & permissions** – Overview of all band members and their roles.
+  Owners can transfer ownership and assign any role; admins can assign moderator
+  and member roles.
 - **Dark mode** – Automatic theme switching via `prefers-color-scheme`.
 
 ## Tech stack
@@ -143,7 +146,7 @@ src/
 │   ├── calendar/       Calendar grid, event list, event modal
 │   ├── setlist/        Setlist selection and detail views
 │   └── songs/          Song library and song items
-├── pages/              Home, Calendar, Setlist, Messenger, Login, Register
+├── pages/              Home, Calendar, Setlist, Messenger, Members, Login, Register
 ├── services/           API client and domain services
 ├── utils/              Date, duration and event helpers
 └── main.jsx            App entry point

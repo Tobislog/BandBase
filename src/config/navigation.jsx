@@ -2,12 +2,14 @@ import Home from "../pages/Home";
 import Setlist from "../pages/Setlist";
 import Messenger from "../pages/Messenger";
 import Calendar from "../pages/Calendar";
-import { CalendarDaysIcon, HomeIcon, ListMusic, MessagesCircle } from "lucide-react";
+import Members from "../pages/Members";
+import { CalendarDaysIcon, HomeIcon, ListMusic, MessagesCircle, Users } from "lucide-react";
 
 
 export const NAV_ITEMS = [
     { path: '/', name: 'Home', icon: <HomeIcon />, component: <Home />, title: 'Home' },
     { path: '/calendar', name: 'Calendar', icon: <CalendarDaysIcon />, component: <Calendar />, title: 'Calendar' },
     { path: '/setlist', name: 'Setlists', icon: <ListMusic />, component: <Setlist />, title: 'Setlists' },
-    { path: '/chat', name: 'Messages', icon: <MessagesCircle />, component: <Messenger />, title: 'Messages' }
+    { path: '/chat', name: 'Messages', icon: <MessagesCircle />, component: <Messenger />, title: 'Messages' },
+    { path: '/members', name: 'Members', icon: <Users />, component: <Members />, title: 'Members' }
 ];
