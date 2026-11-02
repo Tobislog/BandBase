@@ -6,6 +6,8 @@ import authRouter from './routes/auth.js';
 import bandsRouter from './routes/bands.js';
 import songsRouter from './routes/songs.js';
 import setlistRouter from './routes/setlists.js';
+import eventsRouter from './routes/events.js';
+import channelsRouter from './routes/channels.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -21,6 +23,8 @@ app.use('/api', authRouter);
 app.use('/api/bands', bandsRouter);
 app.use('/api', songsRouter);
 app.use('/api', setlistRouter);
+app.use('/api', eventsRouter);
+app.use('/api', channelsRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

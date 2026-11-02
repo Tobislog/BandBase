@@ -33,10 +33,3 @@ export async function registerUser(userData) {
         authEvent: false,
     });
 }
-
-export async function getUsersBatch(userIds) {
-    return apiRequest('/users/batch', {
-        method: 'POST',
-        body: { userIds },
-    });
-}

@@ -23,6 +23,9 @@ export async function createTestContext() {
 }
 
 export async function resetAuthData(db) {
+    await db.run('DELETE FROM messages');
+    await db.run('DELETE FROM channels');
+    await db.run('DELETE FROM events');
     await db.run('DELETE FROM sessions');
     await db.run('DELETE FROM band_memberships');
     await db.run('DELETE FROM users');

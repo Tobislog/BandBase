@@ -5,19 +5,22 @@ import ChatMessage from "../../components/ChatMessage";
 import { toEventForm } from "../../utils/event";
 import { addHoursToTime, isOvernightEvent } from "../../utils/date";
 import { useChannels } from "../../context/ChannelProvider";
+import { useBand } from "../../context/BandProvider";
 
 export default function EventModal ({ event, onClose, onSave, onDelete}) {
+    const { canManage } = useBand();
+    const {setActiveChannelId, messages, sendMessage, messagesLoading, error: channelError,} = useChannels();
 
     const [form, setForm] = useState(() => toEventForm(event));
     const [messageContent, setMessageContent] = useState("");
     const [endTimeTouched, setEndTimeTouched] = useState(false);
     const [showMeetup, setShowMeetup] = useState(Boolean(event?.meetupTime));
-    const {setActiveChannelId, messages, sendMessage } = useChannels();
+    const [error, setError] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
-        if (event?.channelId) {
-            setActiveChannelId(event.channelId);
-        }
+        setActiveChannelId(event?.channelId ?? null)
     }, [event?.channelId, setActiveChannelId]);
     
     const handleChange = (e) => {
@@ -43,27 +46,61 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
         }
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!canManage) return;
+
         if (!form.title || !form.date || !form.startTime) {
             alert("Please set Title, Date and Start time!");
             return;
         }
-        onSave(form);
-        onClose();
+
+        setSaving(true);
+        setError('');
+
+        try {
+            await onSave(form);
+            onClose();
+        } catch (err) {
+            setError(err.mesage || 'Event konnte nicht gespeichert werden.');
+            setSaving(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!event?.id || !canManage) return;
+
+        setDeleting(true);
+        setError('');
+
+        try {
+            await onDelete(event.id);
+            onClose();
+        } catch (err) {
+            setError(err.message || 'Event konnte nicht gelöscht werden.');
+            setDeleting(false);
+        }
     }
 
     const handleInputChange = (e) => {
         setMessageContent(e.target.value);
     }
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         if(!event?.channelId) return;
         if(!messageContent.trim()) return;
-        sendMessage(event.channelId, messageContent);
-        setMessageContent('');
-    }
+
+        try {
+            await sendMessage(event.channelId, messageContent);
+            setMessageContent('');
+        } catch (err) {
+            setError(err.message || 'Nachricht konnte nicht gesendet werden.');
+        }
+    };
+
+    const disabled = !canManage || saving || deleting;
+    const visibleError = error || channelError;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -73,6 +110,11 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                     <BasicButton icon={<CircleX />} onClick={onClose} />
                 </div>
                 <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6">
+                    {visibleError && (
+                        <div className="rounded-md border border-red-500/40 bg-red-400/10 px-3 py-2 text-sm text-red-500">
+                            {visibleError}
+                        </div>
+                    )}
                     <form className="flex flex-col gap-4 border-b border-line pb-4">
                         <div>
                             <label className="block text-sm font-medium mb-1">*Title</label>
@@ -85,6 +127,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                 placeholder="Title"
                                 required
                                 autoFocus
+                                disabled={!canManage}
                             />
                         </div>
                         <div>
@@ -96,6 +139,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                 onChange={handleChange}
                                 className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
                                 required
+                                disabled={!canManage}
                             />
                         </div>
                         <div>
@@ -106,6 +150,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                         checked={showMeetup}
                                         onChange={handleMeetupToggle}
                                         className="appearance-none w-3.5 h-3.5 bg-line rounded border-line accent-brand checked:bg-brand cursor-pointer transition-colors mr-1"
+                                        disabled={!canManage}
                                     />
                                     Meetup
                                     </label>
@@ -118,6 +163,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                     value={form.meetupTime || ""}
                                     onChange={handleChange}
                                     className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                                    disabled={!canManage}
                                 />
                             )}
                         </div>
@@ -131,6 +177,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                     onChange={handleChange}
                                     className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
                                     required
+                                    disabled={!canManage}
                                 />
                             </div>
                             <div>
@@ -141,6 +188,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                     value={form.endTime}
                                     onChange={handleChange}
                                     className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                                    disabled={!canManage}
                                 />
                                 {isOvernightEvent(form) && (<p className="text-xs text-brand pt-1">Ende am Folgetag</p>)}
                             </div>
@@ -153,6 +201,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                 value={form.category}
                                 onChange={handleChange}
                                 className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand bg-surface"
+                                disabled={!canManage}
                             >
                                 <option value="rehearsal">Rehearsal</option>
                                 <option value="gig">Gig</option>
@@ -168,40 +217,59 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                                 placeholder="Optional Details"
                                 rows="3"
                                 className="w-full p-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand resize-none"
+                                disabled={!canManage}
                             />
                         </div>
-                        <div className="flex justify-end gap-4">
-                            {event?.id && (
+                        {canManage && (
+                            <div className="flex justify-end gap-4">
+                                {event?.id && (
+                                    <BasicButton 
+                                        icon={<Trash />}
+                                        onClick={handleDelete}
+                                        isDelete
+                                        disabled={disabled}
+                                    />
+                                )}
                                 <BasicButton 
-                                    icon={<Trash />}
-                                    onClick={onDelete}
-                                    isDelete
+                                    icon={<Save />}
+                                    onClick={handleSubmit}
+                                    disabled={disabled}
                                 />
-                            )}
-                            <BasicButton 
-                                icon={<Save />}
-                                onClick={handleSubmit}
-                            />
-                        </div>
+                            </div>
+                        )}
                     </form>
-                    <div>
-                        <h3 className="text-l font-semibold mb-3">Nachrichten</h3>
-                        <div className="flex flex-col gap-2 bg-surface-accent border border-line rounded p-2 mb-4 ">
-                        {messages.map((m) => (
-                            <ChatMessage key={m.id} message={m}/>
-                        ))}
+                    {event?.channelId ? (
+                        <div>
+                            <h3 className="text-l font-semibold mb-3">Nachrichten</h3>
+                            <div className="flex flex-col gap-2 bg-surface-accent border border-line rounded p-2 mb-4 ">
+                            {messagesLoading && messages.length === 0 ? (
+                                <p className="text-sm text-copy/60">Lade Nachrichten...</p>
+                            ) : (
+                                messages.map((m) => (
+                                <ChatMessage key={m.id} message={m}/>
+                                ))
+                            )}
+                            </div>
+                            <div className="flex flex-row items-center justify-between">
+                                <input 
+                                    type="text" 
+                                    value={messageContent} 
+                                    onChange={handleInputChange}
+                                    placeholder="Nachricht schreiben..."
+                                    className="p-1 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                                />
+                                <BasicButton 
+                                    icon={<SendHorizonal />} 
+                                    onClick={handleSendMessage}
+                                    disabled={messagesLoading || !messageContent.trim()}
+                                />
+                            </div>
                         </div>
-                        <div className="flex flex-row items-center justify-between">
-                            <input 
-                                type="text" 
-                                value={messageContent} 
-                                onChange={handleInputChange}
-                                placeholder="Nachricht schreiben..."
-                                className="p-1 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
-                            />
-                            <BasicButton icon={<SendHorizonal />} onClick={handleSendMessage}/>
-                        </div>
-                    </div>
+                    ) : (
+                        <p className="text-sm text-copy/60">
+                            Nachrichten sind nach dem Speichern des Events verfügbar.
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

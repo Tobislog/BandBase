@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
-import { saveStoredEvents, getStoredEvents } from "../services/storageService";
+import { createContext, useContext, useState, useEffect } from "react";
 import { compareEvents } from "../utils/date";
-import { normalizeEvent, getNextEventId } from "../utils/event"
+import { createEvent, deleteEvent as deleteEventRequest, getEvents, updateEvent} from "../services/eventService";
 import { useChannels } from "./ChannelProvider";
 import { useBand } from "./BandProvider";
 
@@ -11,67 +10,106 @@ const sortEvents = (events) => [...events].sort(compareEvents);
 
 
 export function EventProvider({children}) {
-    const { band, membership } = useBand();
-    const [allEvents, setAllEvents] = useState(() =>
-        sortEvents(getStoredEvents())
-    );
-    const { createEventChannel, deleteChannel, deleteEventChannels } = useChannels();
+    const { band, membership, activeBandId } = useBand();
+    const { refreshChannels } = useChannels();
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const events = useMemo(
-        () => membership && band?.id
-            ? sortEvents(allEvents.filter(e => String(e.bandId) === String(band.id)))
-            : [],
-        [allEvents, band, membership]
-    );
-
+    
     useEffect(() => {
-        saveStoredEvents(allEvents);
-    }, [allEvents]);
+        let cancelled = false;
 
-    const saveEvent = (savedEvent) => {
-        if (!membership || !band?.id) return;
+        const load = async () => {
+            if (!membership || !activeBandId) {
+                if (!cancelled) {
+                    setEvents([]);
+                    setError('');
+                    setLoading(false);
+                }
+                return;
+            }
+            setLoading(true);
+            setError('');
 
-        const normalizedEvent = normalizeEvent(savedEvent);
+            try {
+                const nextEvents = await getEvents(activeBandId);
+                if (!cancelled) setEvents(sortEvents(nextEvents));
+            } catch (err) {
+                if (!cancelled) {
+                    setEvents([]);
+                    setError(err.message || 'Events konnten nicht geladen werden.');
+                }
+            } finally {
+                if (!cancelled) setLoading(false);
+            }  
+        };
+        load();
+            
+        return () => {
+            cancelled = true;
+        };
+    }, [activeBandId, membership]);
 
-        const isExisting = normalizedEvent.id != null
-            && allEvents.some(e => e.id === normalizedEvent.id);
-
-        const eventToSave = isExisting
-            ? normalizedEvent
-            : {
-                ...normalizedEvent,
-                id: getNextEventId(allEvents),
-                bandId: normalizedEvent.bandId ?? band.id,
-            };
-
-        if(!eventToSave.channelId) {
-            eventToSave.channelId = createEventChannel(eventToSave);
+    const saveEvent = async (savedEvent) => {
+        if (!membership || !band?.id) {
+            throw new Error('Keine aktive Band ausgewählt.');
         }
 
-        setAllEvents(prev =>
-            sortEvents(
-                isExisting
-                    ? prev.map(e => e.id === eventToSave.id ? eventToSave : e)
-                    : [...prev, eventToSave]
-            )
-        );
-    };
+        const payload = {
+            title: savedEvent.title ?? '',
+            date: savedEvent.date ?? '',
+            description: savedEvent.description ?? '',
+            category: savedEvent.category ?? 'other',
+            meetupTime: savedEvent.meetupTime || null,
+            startTime: savedEvent.startTime ?? '',
+            endTime: savedEvent.endTime || null,
+            setlistId: savedEvent.setlistId || null,
+        };
 
-    const deleteEvent = (id) => {
-        const eventToDelete = allEvents.find(e => e.id === id);
-        if (eventToDelete?.channelId != null) {
-            deleteChannel(eventToDelete.channelId);
+        try {
+            setError('');
+
+            const saved = savedEvent.id != null
+                ? await updateEvent(savedEvent.id, payload)
+                : await createEvent(band.id, payload);
+
+            setEvents((current) => {
+                const exists = current.some((event) => event.id === saved.id);
+                return sortEvents(
+                    exists
+                        ? current.map((event) => (event.id === saved.id ? saved : event))
+                        : [...current, saved]
+                );
+            });
+
+            await refreshChannels();
+            return saved;
+        } catch (err) {
+            setError(err.message || 'Event konnte nicht gespeichert werden.');
+            throw err;
         }
-        deleteEventChannels(id);
-        setAllEvents(prev => prev.filter(e => e.id !== id));
     };
 
+    const deleteEvent = async (eventId) => {
+        if (eventId == null) return;
+
+        try {
+            setError('');
+            await deleteEventRequest(eventId);
+            setEvents((current) => current.filter((event) => event.id !== eventId));
+            await refreshChannels();
+        } catch (err) {
+            setError(err.message || 'Event konnte nicht gelöscht werden.');
+            throw err;
+        }
+    };
 
     return (
-        <EventContext.Provider value={{ events, saveEvent, deleteEvent }}>
+        <EventContext.Provider value={{ events, saveEvent, deleteEvent, loading, error }}>
             {children}
         </EventContext.Provider>
-    )
+    );
 
 }
 
