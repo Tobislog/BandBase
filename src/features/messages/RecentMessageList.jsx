@@ -46,7 +46,7 @@ export default function RecentMessageList ({ messages }) {
                             </span>
                         </div>
 
-                        <p className="line-clamp-2 break-words text-sm text-copy">
+                        <p className="line-clamp-2 wrap-break-word text-sm text-copy">
                             {message.content}
                         </p>
 
