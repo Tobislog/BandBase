@@ -1,0 +1,45 @@
+name: Deploy Backend to Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy via SSH
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          # Bekannte Hosts akzeptieren, damit der SSH-Befehl nicht hängen bleibt
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+          # Verbindung aufbauen und Befehle auf dem Server ausführen
+          ssh "$SERVER_USER@$SERVER_HOST" << 'EOF'
+            # 1. In das Projektverzeichnis wechseln
+            cd /opt/bandbase/
+
+            # 2. Neuesten Code von GitHub holen
+            git pull origin main
+
+            # 3. Abhängigkeiten installieren & App neu starten 
+            # (Beispiel für Node.js / PM2 - passe das an deinen Stack an!)
+            npm install --production
+            pm2 restart bandbase-backend
+            
+          EOF
