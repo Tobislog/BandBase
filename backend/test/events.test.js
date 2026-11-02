@@ -318,3 +318,55 @@ test('non-members cannot access band event lists', async () => {
 
     assert.equal(res.status, 403);
 });
+
+test('deleting a user with messages is blocked by foreign key', async () => {
+    const owner = await register(ownerData);
+    const agent = await loginAs(ownerData);
+    const bandId = owner.membership.bandId;
+
+    const event = await createEvent(agent, bandId, { title: 'FK Test' });
+
+    const sent = await agent
+        .post(`/api/channels/${event.channelId}/messages`)
+        .send({ content: 'Diese Nachricht blockiert die User-Löschung.' });
+
+    assert.equal(sent.status, 201, JSON.stringify(sent.body));
+
+    await assert.rejects(
+        () => ctx.db.run('DELETE FROM users WHERE id = ?', [owner.user.id]),
+        /FOREIGN KEY constraint failed/
+    );
+
+    const user = await ctx.db.get(
+        'SELECT id FROM users WHERE id = ?',
+        [owner.user.id]
+    );
+
+    assert.ok(user);
+});
+
+test('deleting a user without messages keeps channels and clears created_by', async () => {
+    const owner = await register(ownerData);
+    const member = await register(memberData);
+    const bandId = owner.membership.bandId;
+
+    const custom = await ctx.db.run(
+        `INSERT INTO channels (band_id, type, event_id, name, created_by)
+         VALUES (?, 'custom', NULL, 'Created by member', ?)`,
+        [bandId, member.user.id]
+    );
+
+    const deleted = await ctx.db.run(
+        'DELETE FROM users WHERE id = ?',
+        [member.user.id]
+    );
+    assert.equal(deleted.changes, 1);
+
+    const channel = await ctx.db.get(
+        'SELECT id, created_by AS createdBy FROM channels WHERE id = ?',
+        [custom.lastID]
+    );
+
+    assert.ok(channel);
+    assert.equal(channel.createdBy, null);
+});
