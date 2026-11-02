@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useEvent } from "../context/EventProvider";
 import { useBand } from "../context/BandProvider";
 import { getRecentMessages } from "../services/channelService";
-import RecentMessageList from "../features/messages/recentMessageList";
+import RecentMessageList from "../features/messages/RecentMessageList";
 import { compareEvents, toDateKey, toTimeKey} from "../utils/date";
 
 const getEventStartKey = (event) => {
