@@ -1,10 +1,11 @@
 import React from "react";
 
-export default function BasicButton ({ title, icon, onClick, isDelete}) {
+export default function BasicButton ({ title, icon, onClick, isDelete, disabled = false }) {
     return(
         <button 
             type="button"
             onClick={onClick}
+            disabled={disabled}
             className={`inline-flex items-center justify-center rounded-md font-medium transition-colors 
                         disabled:cursor-not-allowed border border-line cursor-pointer disabled:opacity-40 
                         h-8 px-3 text-xs 

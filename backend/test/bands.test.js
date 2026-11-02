@@ -301,7 +301,7 @@ test('owner can assign roles, cannot demote self, and can transfer ownership ato
 });
 
 test('band isolation prevents reading and changing memberships of another band', async () => {
-    const owner = await register(ownerData);
+    await register(ownerData);
     const outsider = await register(memberData);
 
     const ownBandId = await defaultBandId();

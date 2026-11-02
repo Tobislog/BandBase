@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
-import authRouter from './routes/auth.js'
-import bandsRouter from './routes/bands.js'
+import authRouter from './routes/auth.js';
+import bandsRouter from './routes/bands.js';
+import songsRouter from './routes/songs.js';
+import setlistRouter from './routes/setlists.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -17,6 +19,8 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api', authRouter);
 app.use('/api/bands', bandsRouter);
+app.use('/api', songsRouter);
+app.use('/api', setlistRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

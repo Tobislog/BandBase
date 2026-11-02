@@ -27,4 +27,6 @@ export async function resetAuthData(db) {
     await db.run('DELETE FROM band_memberships');
     await db.run('DELETE FROM users');
     await db.run('DELETE FROM bands WHERE name <> ?', ['Band_01']);
+    await db.run('DELETE FROM setlists');
+    await db.run('DELETE FROM songs');
 }
