@@ -33,15 +33,19 @@ jobs:
 
           echo "Starte Deployment zu $SERVER_USER@$SERVER_HOST..."
 
-          # 2. Bekannte Hosts akzeptieren
+          # 2. Prüfen, ob der SSH-Agent den Key geladen hat
+          echo "Prüfe geladene SSH-Keys im Agenten:"
+          ssh-add -l
+
+          # 3. Bekannte Hosts akzeptieren
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
-          # 3. Verbindung aufbauen (ohne -v, um Logs sauber zu halten, dafür mit strict error checking)
-          ssh -o BatchMode=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
-            set -e  # Bricht sofort ab, wenn ein Befehl im Server-Skript fehlschlägt
+          # 4. Verbindung aufbauen mit erzwungener Key-Nutzung und Verbose-Fehlerausgabe bei Bedarf
+          ssh -o IdentitiesOnly=yes -o BatchMode=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
+            set -e
             
             echo "Verbunden! Gehe in das Projektverzeichnis..."
             cd /opt/bandbase/
