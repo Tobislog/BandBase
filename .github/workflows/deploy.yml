@@ -44,7 +44,7 @@ jobs:
           chmod 600 ~/.ssh/known_hosts
 
           # 4. Verbindung aufbauen mit erzwungener Key-Nutzung und Verbose-Fehlerausgabe bei Bedarf
-          ssh -o IdentitiesOnly=yes -o BatchMode=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
+          ssh -v -o IdentitiesOnly=yes -o BatchMode=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
             set -e
             
             echo "Verbunden! Gehe in das Projektverzeichnis..."
