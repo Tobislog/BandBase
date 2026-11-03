@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { all, withTransaction } from '../db/index.js';
 import { requireAuth } from '../middleware/auth.js';
-import { requireBandMember, requireRoleManager } from '../middleware/bandAccess.js';
+import { requireBandMember, requireBandOwner, requireRoleManager } from '../middleware/bandAccess.js';
 import { HttpError } from '../utils/httpError.js';
 import { isValidRole } from '../utils/validation.js';
 
@@ -108,6 +108,51 @@ router.patch('/:bandId/memberships/:userId', requireBandMember, requireRoleManag
         );
     });
     res.json({ membership })
+});
+
+router.delete('/:bandId/memberships/:userId', requireBandMember, requireBandOwner, async (req, res) => {
+    const bandId = req.bandId;
+    const callerId = req.user.id;
+    const targetUserId = parseUserId(req.params.userId);
+
+    await withTransaction(async (tx) => {
+        const caller = await tx.get(
+            'SELECT role FROM band_memberships WHERE band_id = ? AND user_id = ?',
+            [bandId, callerId]
+        );
+
+        if (caller?.role !== 'owner') {
+            throw new HttpError(403, 'Owner permission required');
+        }
+
+        const target = await tx.get(
+            'SELECT role FROM band_memberships WHERE band_id = ? AND user_id = ?',
+            [bandId, targetUserId]
+        );
+
+        if (!target) {
+            throw new HttpError(404, 'Membership not found');
+        }
+
+        if (targetUserId === callerId || target.role === 'owner') {
+            throw new HttpError(403, 'Owner membership cannot be removed');
+        }
+
+        await tx.run(`
+            DELETE FROM channel_members
+            WHERE user_id = ?
+              AND channel_id IN (SELECT id FROM channels WHERE band_id = ?)
+            `,
+            [targetUserId, bandId]
+        );
+
+        await tx.run(
+            'DELETE FROM band_memberships WHERE band_id = ? AND user_id = ?',
+            [bandId, targetUserId]
+        );
+    });
+
+    res.status(204).end();
 });
 
 export default router;

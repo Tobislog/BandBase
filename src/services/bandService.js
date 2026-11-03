@@ -14,3 +14,7 @@ export async function updateMembershipRole(bandId, userId, role) {
     const data = await apiRequest(`/bands/${bandId}/memberships/${userId}`, {method: 'PATCH', body: { role }});
     return data.membership;
 }
+
+export async function deleteMembership(bandId, userId) {
+    await apiRequest(`/bands/${bandId}/memberships/${userId}`, { method: 'DELETE' });
+}

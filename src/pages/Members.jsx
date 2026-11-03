@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { ShieldCheck, UserPlus, Users, UserX } from "lucide-react";
+import { ShieldCheck, Trash, UserPlus, Users, UserX } from "lucide-react";
 import PageHeading from "../components/PageHeading";
 import BasicTile from "../components/BasicTile";
 import BasicButton from "../components/BasicButton";
 import { useAuth } from "../context/AuthProvider";
 import { useBand } from "../context/BandProvider";
-import { getMemberships, updateMembershipRole } from "../services/bandService";
+import { deleteMembership, getMemberships, updateMembershipRole } from "../services/bandService";
 import { getRegistrationStatus, updateRegistrationStatus } from "../services/settingsService";
 
 const ROLE_LABELS = {
@@ -103,6 +103,7 @@ export default function Members () {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [savingUserId, setSavingUserId] = useState(null);
+    const [removingUserId, setRemovingUserId] = useState(null);
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
     const [registrationLoading, setRegistrationLoading] = useState(true);
     const [registrationSaving, setRegistrationSaving] = useState(false);
@@ -208,6 +209,33 @@ export default function Members () {
         }
     };
 
+    const handleRemoveMember = async (member) => {
+        if (!isOwner || !activeBandId || removingUserId !== null) return;
+
+        const isCurrentUser = String(member.userId) === String(user?.id);
+
+        if (isCurrentUser || member.role === 'owner') return;
+
+        const confirmed = window.confirm(
+            `${getMemberName(member)} wirklich aus der Band entfernen? Der User-Account und die Chat-Historie bleiben bestehen.`
+        );
+        if (!confirmed) return;
+
+        setRemovingUserId(member.userId);
+        setError('');
+
+        try {
+            await deleteMembership(activeBandId, member.userId);
+            setMembers((current) => current.filter(
+                (item) => String(item.userId) !== String(member.userId)
+            ));
+        } catch (err) {
+            setError(err.message || 'Mitglied konnte nicht entfernt werden.');
+        } finally {
+            setRemovingUserId(null);
+        }
+    };
+
     const handleToggleRegistration = async () => {
         if (!isOwner || registrationSaving || registrationLoading) return;
 
@@ -272,6 +300,7 @@ export default function Members () {
                                 {members.map((member) => {
                                     const roles = assignableRoles(member);
                                     const isCurrentUser = String(member.userId) === String(user?.id);
+                                    const canRemove = isOwner && !isCurrentUser && member.role !== 'owner';
                                     const name = getMemberName(member);
 
                                     return (
@@ -298,6 +327,16 @@ export default function Members () {
                                             </div>
 
                                             <RoleBadge role={member.role} />
+
+                                            {canRemove && (
+                                                <BasicButton
+                                                    title="Entfernen"
+                                                    icon={<Trash />}
+                                                    onClick={() => handleRemoveMember(member)}
+                                                    isDelete
+                                                    disabled={removingUserId !== null || savingUserId !== null}
+                                                />
+                                            )}
 
                                             {roles.length > 0 && (
                                                 <select

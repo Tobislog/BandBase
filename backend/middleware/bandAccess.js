@@ -54,6 +54,16 @@ export function requireRoleManager(req, res, next) {
     next();
 }
 
+export function requireBandOwner(req, res, next) {
+    const role = req.bandMembership?.role;
+
+    if (role !== 'owner') {
+        next(new HttpError(403, 'Owner permission required'));
+        return;
+    }
+    next();
+}
+
 export async function requireDefaultBandOwner(req, res, next) {
     try {
         const membership = await get(`

@@ -300,6 +300,76 @@ test('owner can assign roles, cannot demote self, and can transfer ownership ato
     assert.equal(res.status, 403);
 });
 
+test('owner can remove a member and cleans up band channel memberships', async () => {
+    await register(ownerData);
+    const member = await register(memberData);
+    const bandId = await defaultBandId();
+    const ownerAgent = await loginAs(ownerData);
+
+    const channel = await ctx.db.run(
+        'INSERT INTO channels (band_id, type, name) VALUES (?, ?, ?)',
+        [bandId, 'custom', 'Test Channel']
+    );
+
+    await ctx.db.run(
+        'INSERT INTO channel_members (channel_id, user_id) VALUES (?, ?)',
+        [channel.lastID, member.user.id]
+    );
+
+    const res = await ownerAgent.delete(`/api/bands/${bandId}/memberships/${member.user.id}`);
+
+    assert.equal(res.status, 204);
+    assert.equal(await roleIn(bandId, member.user.id), null);
+
+    const user = await ctx.db.get('SELECT id FROM users WHERE id = ?', [member.user.id]);
+    assert.ok(user);
+
+    const channelMembership = await ctx.db.get(
+        'SELECT channel_id FROM channel_members WHERE channel_id = ? AND user_id = ?',
+        [channel.lastID, member.user.id]
+    );
+    assert.equal(channelMembership, undefined);
+
+    const memberAgent = await loginAs(memberData);
+    const bands = await memberAgent.get('/api/bands');
+    assert.equal(bands.status, 200);
+    assert.deepEqual(bands.body.bands, []);
+});
+
+test('only the owner can remove members and the owner cannot be removed', async () => {
+    const owner = await register(ownerData);
+    await register(memberData);
+    const admin = await register(adminData);
+    const target = await register(targetData);
+    const bandId = await defaultBandId();
+    const ownerAgent = await loginAs(ownerData);
+
+    await ownerAgent
+        .patch(`/api/bands/${bandId}/memberships/${admin.user.id}`)
+        .send({ role: 'admin' })
+        .expect(200);
+
+    const memberAgent = await loginAs(memberData);
+    let res = await memberAgent.delete(`/api/bands/${bandId}/memberships/${target.user.id}`);
+    assert.equal(res.status, 403);
+
+    const adminAgent = await loginAs(adminData);
+    res = await adminAgent.delete(`/api/bands/${bandId}/memberships/${target.user.id}`);
+    assert.equal(res.status, 403);
+
+    res = await ownerAgent.delete(`/api/bands/${bandId}/memberships/${owner.user.id}`);
+    assert.equal(res.status, 403);
+
+    res = await ownerAgent.delete(`/api/bands/${bandId}/memberships/999999`);
+    assert.equal(res.status, 404);
+
+    res = await ownerAgent.delete(`/api/bands/${bandId}/memberships/${admin.user.id}`);
+    assert.equal(res.status, 204);
+
+    res = await ownerAgent.delete(`/api/bands/${bandId}/memberships/${target.user.id}`);
+    assert.equal(res.status, 204);
+});
+
 test('band isolation prevents reading and changing memberships of another band', async () => {
     await register(ownerData);
     const outsider = await register(memberData);
