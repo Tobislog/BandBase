@@ -33,19 +33,27 @@ jobs:
 
           echo "Starte Deployment zu $SERVER_USER@$SERVER_HOST..."
 
-          # 2. Bekannte Hosts akzeptieren (mit explizitem Port 22 für den Tunnel)
+          # 2. Bekannte Hosts akzeptieren
           mkdir -p ~/.ssh
-          ssh-keyscan -p 22 -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-          # 3. Verbindung aufbauen und Befehle auf dem Server ausführen
-          ssh -v -p 22 "$SERVER_USER@$SERVER_HOST" << 'EOF'
-            # 1. In das Projektverzeichnis wechseln
+          # 3. Verbindung aufbauen (ohne -v, um Logs sauber zu halten, dafür mit strict error checking)
+          ssh -o BatchMode=yes "$SERVER_USER@$SERVER_HOST" << 'EOF'
+            set -e  # Bricht sofort ab, wenn ein Befehl im Server-Skript fehlschlägt
+            
+            echo "Verbunden! Gehe in das Projektverzeichnis..."
             cd /opt/bandbase/
-
-            # 2. Neuesten Code von GitHub holen
+            
+            echo "Hole neuesten Code..."
             git pull origin main
-
-            # 3. Abhängigkeiten installieren & App neu starten 
+            
+            echo "Installiere Abhängigkeiten..."
             npm install --production
+            
+            echo "Starte App neu..."
             pm2 restart bandbase-backend
+            
+            echo "Deployment erfolgreich abgeschlossen!"
           EOF
