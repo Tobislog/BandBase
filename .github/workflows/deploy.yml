@@ -25,15 +25,12 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          # Debug-Ausgabe zur Kontrolle
-          echo "Host ist: $SERVER_HOST"
-          
           # Bekannte Hosts akzeptieren, damit der SSH-Befehl nicht hängen bleibt
           mkdir -p ~/.ssh
           ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
 
           # Verbindung aufbauen und Befehle auf dem Server ausführen
-          ssh "$SERVER_USER@$SERVER_HOST" << 'EOF'
+          ssh -v "$SERVER_USER@$SERVER_HOST" << 'EOF'
             # 1. In das Projektverzeichnis wechseln
             cd /opt/bandbase/
 
