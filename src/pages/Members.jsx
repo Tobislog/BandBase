@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { ShieldCheck, Users } from "lucide-react";
+import { ShieldCheck, UserPlus, Users, UserX } from "lucide-react";
 import PageHeading from "../components/PageHeading";
 import BasicTile from "../components/BasicTile";
+import BasicButton from "../components/BasicButton";
 import { useAuth } from "../context/AuthProvider";
 import { useBand } from "../context/BandProvider";
 import { getMemberships, updateMembershipRole } from "../services/bandService";
+import { getRegistrationStatus, updateRegistrationStatus } from "../services/settingsService";
 
 const ROLE_LABELS = {
     owner: 'Owner',
@@ -101,6 +103,31 @@ export default function Members () {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [savingUserId, setSavingUserId] = useState(null);
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [registrationLoading, setRegistrationLoading] = useState(true);
+    const [registrationSaving, setRegistrationSaving] = useState(false);
+    const [registrationError, setRegistrationError] = useState('');
+
+    useEffect(() => {
+        let cancelled = false;
+
+        getRegistrationStatus()
+            .then((enabled) => {
+                if (!cancelled) setRegistrationEnabled(enabled);
+            })
+            .catch((err) => {
+                if (!cancelled) {
+                    setRegistrationError(err.message || 'Registrierungsstatus konnte nicht geladen werden.');
+                }
+            })
+            .finally(() => {
+                if (!cancelled) setRegistrationLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     useEffect(() => {
         let cancelled = false;
@@ -178,6 +205,31 @@ export default function Members () {
             setError(err.message || 'Rolle konnte nicht geändert werden.');
         } finally {
             setSavingUserId(null);
+        }
+    };
+
+    const handleToggleRegistration = async () => {
+        if (!isOwner || registrationSaving || registrationLoading) return;
+
+        const nextEnabled = !registrationEnabled;
+
+        if (!nextEnabled) {
+            const confirmed = window.confirm(
+                'Neue Registrierungen wirklich deaktivieren? Bestehende Accounts können sich weiterhin einloggen.'
+            );
+            if (!confirmed) return;
+        }
+
+        setRegistrationSaving(true);
+        setRegistrationError('');
+
+        try {
+            const enabled = await updateRegistrationStatus(nextEnabled);
+            setRegistrationEnabled(enabled);
+        } catch (err) {
+            setRegistrationError(err.message || 'Registrierung konnte nicht geändert werden.');
+        } finally {
+            setRegistrationSaving(false);
         }
     };
 
@@ -265,6 +317,51 @@ export default function Members () {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        )}
+                    </BasicTile>
+
+                    <BasicTile
+                        title="Registrierung"
+                        icon={<UserPlus />}
+                        button={(
+                            <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${
+                                registrationEnabled
+                                    ? 'border-emerald-500/30 bg-emerald-400/15 text-emerald-600'
+                                    : 'border-red-500/30 bg-red-400/15 text-red-500'
+                            }`}>
+                                {registrationLoading ? 'Lädt...' : registrationEnabled ? 'Aktiv' : 'Deaktiviert'}
+                            </span>
+                        )}
+                    >
+                        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                            <div>
+                                <p className="text-sm font-medium text-heading">
+                                    {registrationEnabled
+                                        ? 'Neue User können sich registrieren.'
+                                        : 'Neue Registrierungen sind gesperrt.'}
+                                </p>
+                                <p className="mt-0.5 text-xs text-copy/60">
+                                    {registrationEnabled
+                                        ? 'Bestehende Accounts sind davon nicht betroffen.'
+                                        : 'Bestehende Accounts können sich weiterhin einloggen.'}
+                                </p>
+                            </div>
+
+                            {isOwner && (
+                                <BasicButton
+                                    title={registrationEnabled ? 'Registrierung deaktivieren' : 'Registrierung aktivieren'}
+                                    icon={registrationEnabled ? <UserX /> : <UserPlus />}
+                                    onClick={handleToggleRegistration}
+                                    isDelete={registrationEnabled}
+                                    disabled={registrationLoading || registrationSaving}
+                                />
+                            )}
+                        </div>
+
+                        {registrationError && (
+                            <div className="border-t border-red-500/30 bg-red-400/10 px-4 py-2 text-sm text-red-500">
+                                {registrationError}
                             </div>
                         )}
                     </BasicTile>

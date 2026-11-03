@@ -23,6 +23,9 @@ export async function createTestContext() {
 }
 
 export async function resetAuthData(db) {
+    await db.run(
+        "UPDATE app_settings SET value = 'true' WHERE key = 'registration_enabled'"
+    );
     await db.run('DELETE FROM messages');
     await db.run('DELETE FROM channels');
     await db.run('DELETE FROM events');

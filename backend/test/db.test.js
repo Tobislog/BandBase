@@ -17,9 +17,14 @@ test('migration sets user_version, enables foreign keys and seeds Band_01 once',
     const foreignKeys =  await ctx.db.get('PRAGMA foreign_keys');
     const bands = await ctx.db.all('SELECT id, name FROM bands WHERE name = "Band_01"');
 
-    assert.equal(version.user_version, 1);
+    assert.equal(version.user_version, 2);
     assert.equal(foreignKeys.foreign_keys, 1);
     assert.equal(bands.length, 1);
+
+    const setting = await ctx.db.get(
+        "SELECT value FROM app_settings WHERE key = 'registration_enabled'"
+    );
+    assert.equal(setting.value, 'true');
 });
 
 test('running the migration runner again is a no-op', async () => {
@@ -33,7 +38,7 @@ test('running the migration runner again is a no-op', async () => {
     const version = await ctx.db.get('PRAGMA user_version');
     const count =  await ctx.db.get("SELECT COUNT(*) AS count FROM bands WHERE name = 'Band_01'");
 
-    assert.equal(version.user_version, 1);
+    assert.equal(version.user_version, 2);
     assert.equal(count.count, 1);
 });
 

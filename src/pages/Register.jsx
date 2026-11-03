@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../services/authService";
+import { getRegistrationStatus } from "../services/settingsService";
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -12,7 +13,28 @@ export default function Register() {
     })
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [statusLoading, setStatusLoading] = useState(true);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        let cancelled = false;
+
+        getRegistrationStatus()
+            .then((enabled) => {
+                if (!cancelled) setRegistrationEnabled(enabled);
+            })
+            .catch(() => {
+                if (!cancelled) setRegistrationEnabled(true);
+            })
+            .finally(() => {
+                if (!cancelled) setStatusLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value })
@@ -36,9 +58,36 @@ export default function Register() {
               navigate('/login');
             }, 2000);
         } catch (err) {
+            if (err.status === 403) {
+                setRegistrationEnabled(false);
+            }
             setError(err.message);
         }
     };
+
+    if (statusLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-surface">
+                <p className="text-copy">Lade Registrierung...</p>
+            </div>
+        );
+    }
+
+    if (!registrationEnabled) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-surface py-12">
+                <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md border border-gray-200 text-center">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800">Registrierung deaktiviert</h2>
+                    <p className="mb-6 text-sm text-gray-600">
+                        Neue Registrierungen sind derzeit nicht möglich. Bestehende Accounts können sich weiterhin einloggen.
+                    </p>
+                    <Link to="/login" className="text-blue-600 hover:underline">
+                        Zum Login
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-surface py-12">

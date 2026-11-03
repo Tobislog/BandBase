@@ -1,4 +1,5 @@
 import { get } from '../db/index.js';
+import { DEFAULT_BAND_NAME } from '../db/seed.js';
 import { HttpError } from '../utils/httpError.js';
 
 const MEMBERSHIP_QUERY = `
@@ -51,4 +52,26 @@ export function requireRoleManager(req, res, next) {
         return;
     }
     next();
+}
+
+export async function requireDefaultBandOwner(req, res, next) {
+    try {
+        const membership = await get(`
+            SELECT m.role
+            FROM band_memberships m
+            JOIN bands b ON b.id = m.band_id
+            WHERE b.name = ? AND m.user_id = ?
+            `,
+            [DEFAULT_BAND_NAME, req.user.id]
+        );
+
+        if (membership?.role !== 'owner') {
+            next(new HttpError(403, 'Default band owner permission required'));
+            return;
+        }
+
+        next();
+    } catch (err) {
+        next(err);
+    }
 }

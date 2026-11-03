@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
+import { getRegistrationStatus } from "../services/settingsService";
 
 export default function Login () {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
     const navigate = useNavigate();
     
     const { login } = useAuth();
+
+    useEffect(() => {
+        let cancelled = false;
+
+        getRegistrationStatus()
+            .then((enabled) => {
+                if (!cancelled) setRegistrationEnabled(enabled);
+            })
+            .catch(() => {});
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -66,9 +82,11 @@ export default function Login () {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Noch kein Konto? <Link to="/register" className="text-blue-600 hover:underline">Registrieren</Link>
-        </p>
+        {registrationEnabled && (
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Noch kein Konto? <Link to="/register" className="text-blue-600 hover:underline">Registrieren</Link>
+          </p>
+        )}
       </div>
     </div>
     )

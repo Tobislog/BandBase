@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { config } from "../config.js";
 import { get, run, withTransaction } from "../db/index.js";
 import { requireAuth } from "../middleware/auth.js";
+import { requireDefaultBandOwner } from "../middleware/bandAccess.js";
 import { HttpError } from "../utils/httpError.js";
 import { createSessionToken, hashSessionToken } from "../utils/tokens.js";
 import { clearSessionCookieOptions, sessionCookieOptions } from "../utils/cookies.js";
@@ -12,13 +13,46 @@ const router = Router();
 const BCRYPT_ROUNDS = 10;
 const DEFAULT_COLOR = '#3b82f6';
 const DEFAULT_BAND_NAME = 'Band_01';
+const REGISTRATION_SETTING_KEY = 'registration_enabled';
 const USER_FIELDS = `id, email, first_name AS firstName, last_name AS lastName, color, created_at AS createdAt`;
+
+function isRegistrationEnabledValue(value) {
+    return value !== 'false';
+}
 
 async function findUsersByEmail(email) {
     return get(
         `SELECT ${USER_FIELDS}, password_hash AS passwordHash FROM users WHERE email = ?`, [email]
     );
 }
+
+router.get('/registration', async (req, res) => {
+    const setting = await get(
+        'SELECT value FROM app_settings WHERE key = ?',
+        [REGISTRATION_SETTING_KEY]
+    );
+
+    res.json({ enabled: isRegistrationEnabledValue(setting?.value) });
+});
+
+router.patch('/registration', requireAuth, requireDefaultBandOwner, async (req, res) => {
+    const enabled = req.body?.enabled;
+
+    if (typeof enabled !== 'boolean') {
+        throw new HttpError(400, 'enabled must be a boolean');
+    }
+
+    await run(`
+        INSERT INTO app_settings (key, value) VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET
+            value = excluded.value,
+            updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+        `,
+        [REGISTRATION_SETTING_KEY, enabled ? 'true' : 'false']
+    );
+
+    res.json({ enabled });
+});
 
 router.post('/register', async (req, res) => {
     const body = req.body ?? {};
@@ -46,6 +80,15 @@ router.post('/register', async (req, res) => {
     const normalizedLastName = lastName.trim();
 
     const result = await withTransaction(async (tx) => {
+        const registrationSetting = await tx.get(
+            'SELECT value FROM app_settings WHERE key = ?',
+            [REGISTRATION_SETTING_KEY]
+        );
+
+        if (!isRegistrationEnabledValue(registrationSetting?.value)) {
+            throw new HttpError(403, 'Registration is disabled');
+        }
+
         const band = await tx.get('SELECT id FROM bands WHERE name = ?', [DEFAULT_BAND_NAME]);
         if (!band) {
             throw new HttpError(500, 'Default Band is missing');
