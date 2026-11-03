@@ -10,7 +10,7 @@ import eventsRouter from './routes/events.js';
 import channelsRouter from './routes/channels.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
-// This is a test v3
+// This is a test v4
 const app = express();
 app.use(cors({ origin: config.corsOrigin, credentials: true }));
 app.use(cookieParser());

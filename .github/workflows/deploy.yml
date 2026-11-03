@@ -25,12 +25,20 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          # Bekannte Hosts akzeptieren, damit der SSH-Befehl nicht hängen bleibt
-          mkdir -p ~/.ssh
-          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+          # 1. Absicherung: Prüfen ob die Variablen da sind
+          if [ -z "$SERVER_HOST" ] || [ -z "$SERVER_USER" ]; then
+            echo "FEHLER: SERVER_HOST oder SERVER_USER ist nicht gesetzt!"
+            exit 1
+          fi
 
-          # Verbindung aufbauen und Befehle auf dem Server ausführen
-          ssh -v "$SERVER_USER@$SERVER_HOST" << 'EOF'
+          echo "Starte Deployment zu $SERVER_USER@$SERVER_HOST..."
+
+          # 2. Bekannte Hosts akzeptieren (mit explizitem Port 22 für den Tunnel)
+          mkdir -p ~/.ssh
+          ssh-keyscan -p 22 -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+          # 3. Verbindung aufbauen und Befehle auf dem Server ausführen
+          ssh -v -p 22 "$SERVER_USER@$SERVER_HOST" << 'EOF'
             # 1. In das Projektverzeichnis wechseln
             cd /opt/bandbase/
 
