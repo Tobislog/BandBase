@@ -1,13 +1,14 @@
-name: Deploy to Production
+name: Deploy Backend
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'backend/**'
+
 jobs:
   deploy:
-    runs-on: self-hosted  # Das ist der entscheidende Punkt!
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Code
@@ -15,8 +16,9 @@ jobs:
 
       - name: Restart App Service
         run: |
-          # Hier ziehen wir den Code und starten den Dienst neu
-          cd /opt/bandbase/backend
+          cd /opt/bandbase
+          git remote set-url origin https://github.com/tobislog/bandbase.git
           git pull
+          cd /opt/bandbase/backend
           npm install --production
           sudo systemctl restart bandbase.service
