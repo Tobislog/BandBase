@@ -29,7 +29,6 @@ jobs:
           echo "Host ist: $SERVER_HOST"
           
           # Bekannte Hosts akzeptieren, damit der SSH-Befehl nicht hängen bleibt
-          run: echo "Host ist: ${{ secrets.SERVER_HOST }}"
           mkdir -p ~/.ssh
           ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
 
