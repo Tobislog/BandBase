@@ -360,34 +360,34 @@ export default function Members () {
                         )}
                     </BasicTile>
 
-                    <BasicTile
-                        title="Registrierung"
-                        icon={<UserPlus />}
-                        button={(
-                            <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${
-                                registrationEnabled
-                                    ? 'border-emerald-500/30 bg-emerald-400/15 text-emerald-600'
-                                    : 'border-red-500/30 bg-red-400/15 text-red-500'
-                            }`}>
-                                {registrationLoading ? 'Lädt...' : registrationEnabled ? 'Aktiv' : 'Deaktiviert'}
-                            </span>
-                        )}
-                    >
-                        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-                            <div>
-                                <p className="text-sm font-medium text-heading">
-                                    {registrationEnabled
-                                        ? 'Neue User können sich registrieren.'
-                                        : 'Neue Registrierungen sind gesperrt.'}
-                                </p>
-                                <p className="mt-0.5 text-xs text-copy/60">
-                                    {registrationEnabled
-                                        ? 'Bestehende Accounts sind davon nicht betroffen.'
-                                        : 'Bestehende Accounts können sich weiterhin einloggen.'}
-                                </p>
-                            </div>
+                    {isOwner && (
+                        <BasicTile
+                            title="Registrierung"
+                            icon={<UserPlus />}
+                            button={(
+                                <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${
+                                    registrationEnabled
+                                        ? 'border-emerald-500/30 bg-emerald-400/15 text-emerald-600'
+                                        : 'border-red-500/30 bg-red-400/15 text-red-500'
+                                }`}>
+                                    {registrationLoading ? 'Lädt...' : registrationEnabled ? 'Aktiv' : 'Deaktiviert'}
+                                </span>
+                            )}
+                        >
+                            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                                <div>
+                                    <p className="text-sm font-medium text-heading">
+                                        {registrationEnabled
+                                            ? 'Neue User können sich registrieren.'
+                                            : 'Neue Registrierungen sind gesperrt.'}
+                                    </p>
+                                    <p className="mt-0.5 text-xs text-copy/60">
+                                        {registrationEnabled
+                                            ? 'Bestehende Accounts sind davon nicht betroffen.'
+                                            : 'Bestehende Accounts können sich weiterhin einloggen.'}
+                                    </p>
+                                </div>
 
-                            {isOwner && (
                                 <BasicButton
                                     title={registrationEnabled ? 'Registrierung deaktivieren' : 'Registrierung aktivieren'}
                                     icon={registrationEnabled ? <UserX /> : <UserPlus />}
@@ -395,15 +395,15 @@ export default function Members () {
                                     isDelete={registrationEnabled}
                                     disabled={registrationLoading || registrationSaving}
                                 />
-                            )}
-                        </div>
-
-                        {registrationError && (
-                            <div className="border-t border-red-500/30 bg-red-400/10 px-4 py-2 text-sm text-red-500">
-                                {registrationError}
                             </div>
-                        )}
-                    </BasicTile>
+
+                            {registrationError && (
+                                <div className="border-t border-red-500/30 bg-red-400/10 px-4 py-2 text-sm text-red-500">
+                                    {registrationError}
+                                </div>
+                            )}
+                        </BasicTile>
+                    )}
 
                     <BasicTile title="Rollen & Rechte" icon={<ShieldCheck />}>
                         <PermissionMatrix />
