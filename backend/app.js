@@ -10,7 +10,7 @@ import eventsRouter from './routes/events.js';
 import channelsRouter from './routes/channels.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
-// Das ist eine Änderung im Backend
+// Neue BackendÄnderung
 
 const app = express();
 app.use(cors({ origin: config.corsOrigin, credentials: true }));
