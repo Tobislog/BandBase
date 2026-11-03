@@ -1,0 +1,22 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+jobs:
+  deploy:
+    runs-on: self-hosted  # Das ist der entscheidende Punkt!
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Restart App Service
+        run: |
+          # Hier ziehen wir den Code und starten den Dienst neu
+          cd /opt/bandbase/backend
+          git pull
+          npm install --production
+          sudo systemctl restart bandbase.service
