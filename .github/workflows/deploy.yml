@@ -25,7 +25,7 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          # Debug-Ausgabe zur Kontrolle (wird im Log als Sternchen oder Klartext angezeigt, je nach Konfiguration)
+          # Debug-Ausgabe zur Kontrolle
           echo "Host ist: $SERVER_HOST"
           
           # Bekannte Hosts akzeptieren, damit der SSH-Befehl nicht hängen bleibt
@@ -41,8 +41,6 @@ jobs:
             git pull origin main
 
             # 3. Abhängigkeiten installieren & App neu starten 
-            # (Beispiel für Node.js / PM2 - passe das an deinen Stack an!)
             npm install --production
             pm2 restart bandbase-backend
-            
           EOF
