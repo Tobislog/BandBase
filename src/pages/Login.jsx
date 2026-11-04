@@ -3,11 +3,15 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { getRegistrationStatus } from "../services/settingsService";
 
+const DEMO_EMAIL = 'demo-user@demo-mail.de';
+const DEMO_PASSWORD = 'demouser';
+
 export default function Login () {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [demoLoading, setDemoLoading] = useState(false);
     const navigate = useNavigate();
     
     const { login } = useAuth();
@@ -36,6 +40,20 @@ export default function Login () {
 
         } catch (err) {
             setError(err.message);
+        }
+    };
+
+    const handleDemoLogin = async () => {
+        setError('');
+        setDemoLoading(true);
+
+        try {
+            await login(DEMO_EMAIL, DEMO_PASSWORD);
+            navigate('/');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setDemoLoading(false);
         }
     };
     return (
@@ -82,6 +100,23 @@ export default function Login () {
           </button>
         </form>
 
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-gray-500">oder</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={demoLoading}
+          className="w-full py-2 px-4 border border-blue-600 text-blue-600 font-semibold rounded-md hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {demoLoading ? 'Demo-Login läuft…' : 'Als Demo-Benutzer anmelden'}
+        </button>
         {registrationEnabled && (
           <p className="mt-4 text-center text-sm text-gray-600">
             Noch kein Konto? <Link to="/register" className="text-blue-600 hover:underline">Registrieren</Link>
