@@ -10,10 +10,9 @@ import MessageWidget from "../messages/MessageWidget";
 
 export default function EventModal ({ event, onClose, onSave, onDelete}) {
     const { canManage } = useBand();
-    const {setActiveChannelId, messages, sendMessage, messagesLoading, error: channelError,} = useChannels();
+    const {setActiveChannelId, error: channelError,} = useChannels();
 
     const [form, setForm] = useState(() => toEventForm(event));
-    const [messageContent, setMessageContent] = useState("");
     const [endTimeTouched, setEndTimeTouched] = useState(false);
     const [showMeetup, setShowMeetup] = useState(Boolean(event?.meetupTime));
     const [error, setError] = useState('');
@@ -82,23 +81,6 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
             setDeleting(false);
         }
     }
-
-    const handleInputChange = (e) => {
-        setMessageContent(e.target.value);
-    }
-
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if(!event?.channelId) return;
-        if(!messageContent.trim()) return;
-
-        try {
-            await sendMessage(event.channelId, messageContent);
-            setMessageContent('');
-        } catch (err) {
-            setError(err.message || 'Nachricht konnte nicht gesendet werden.');
-        }
-    };
 
     const disabled = !canManage || saving || deleting;
     const visibleError = error || channelError;

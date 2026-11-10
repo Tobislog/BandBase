@@ -2,7 +2,7 @@ import { CalendarPlus } from "lucide-react";
 import BasicButton from "../components/BasicButton";
 import PageHeading from "../components/PageHeading";
 import CalendarWidget from "../features/calendar/CalendarWidget";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EventModal from "../features/calendar/EventModal";
 import EventList from "../features/calendar/EventList";
 import { useEvent } from "../context/EventProvider";
@@ -14,6 +14,8 @@ export default function Calendar () {
     const { canManage } = useBand();
     const [modalEvent, setModalEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date());
+
+    
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -41,6 +43,23 @@ export default function Calendar () {
         setModalEvent(null);
         setIsModalOpen(true)
     }
+    
+    // Eventlistener for closeModal on ESC-Press
+    useEffect(() => {
+        if (!isModalOpen) return;
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [isModalOpen, closeModal]);
 
     return (
         <div>
