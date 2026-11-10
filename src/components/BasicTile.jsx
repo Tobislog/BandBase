@@ -1,8 +1,8 @@
 import React from "react";
 
-export default function BasicTile ({children, title, icon, button}) {
+export default function BasicTile ({children, title, icon, button, className = ""}) {
     return (
-        <div className="rounded-xl border border-line overflow-hidden bg-surface-accent">
+        <div className={`rounded-xl border border-line overflow-hidden bg-surface-accent ${className}`}>
             {title && (
                 <div className="flex items-center justify-between border-b border-line px-4 py-3">
                     <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
