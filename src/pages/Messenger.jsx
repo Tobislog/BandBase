@@ -1,16 +1,15 @@
 import BasicTile from "../components/BasicTile"
 import BasicButton from "../components/BasicButton"
-import ChatMessage from "../components/ChatMessage"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useBand } from "../context/BandProvider"
 import { useChannels } from "../context/ChannelProvider"
-import { MessageCirclePlus, MessagesCircle, SendHorizonal } from "lucide-react"
+import { MessageCirclePlus, MessagesCircle } from "lucide-react"
+import MessageWidget from "../features/messages/MessageWidget"
 
 export default function Messenger () {
     const { canManage } = useBand();
-    const { channels, activeChannelId, setActiveChannelId, messages} = useChannels();
-    const [messageContent, setMessageContent] = useState("");
+    const { channels, activeChannelId, setActiveChannelId} = useChannels();
 
     useEffect(() => {
         if (channels && channels.length > 0 && !activeChannelId) {
@@ -21,22 +20,6 @@ export default function Messenger () {
     const handleSelectChannel = (id) => {
         setActiveChannelId(id);
     }
-
-    const handleInputChange = (e) => {
-        setMessageContent(e.target.value);
-    }
-
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if(!messageContent.trim()) return;
-
-        try {
-            await sendMessage(activeChannelId, messageContent);
-            setMessageContent('');
-        } catch (err) {
-            setError(err.message || 'Nachricht konnte nicht gesendet werden.');
-        }
-    };
 
     return (
         <div>
@@ -57,25 +40,7 @@ export default function Messenger () {
                             </div>
                         ))}
                     </div>
-                    <div className="flex-4 p-2">
-                        {messages.map((message) => (
-                            <ChatMessage key={message.id} message={message}/>
-                        ))}
-                    </div>
-                    <div className="flex flex-row items-center justify-between">
-                        <input 
-                            type="text" 
-                            value={messageContent} 
-                            onChange={handleInputChange}
-                            placeholder="Nachricht schreiben..."
-                            className="p-1 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
-                        />
-                        <BasicButton 
-                            icon={<SendHorizonal />} 
-                            onClick={handleSendMessage}
-                            disabled={!messageContent.trim()}
-                        />
-                    </div>
+                    <MessageWidget className="flex-4" />
                 </div>
             </BasicTile>
         </div>
