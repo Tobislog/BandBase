@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { SendHorizonal } from "lucide-react";
 
 import BasicButton from "../../components/BasicButton";
@@ -9,6 +9,7 @@ import ChatMessage from "../../components/ChatMessage"
 export default function MessageWidget({ className = "", onError }) {
     const { messages, messagesLoading, activeChannelId, sendMessage } = useChannels();
     const [messageContent, setMessageContent] = useState("");
+    const containerRef = useRef(null);
 
     const handleInputChange = (e) => {
         setMessageContent(e.target.value);
@@ -33,9 +34,19 @@ export default function MessageWidget({ className = "", onError }) {
         }
     }
 
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages])
+
+    const scrollToBottom = () => {
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        };
+    }
+
     return (
-        <div className={`p-2 ${className}`}>
-            <div className="flex flex-col gap-2 bg-surface-accent border border-line rounded p-2 mb-4 ">
+        <div className={`p-2 flex flex-col justify-between ${className}`}>
+            <div ref={containerRef} className="flex flex-col gap-2 bg-surface-accent border border-line rounded p-2 mb-4 max-h-100 overflow-auto">
             {messagesLoading && messages.length === 0 ? (
                 <p className="text-sm text-copy/60">Lade Nachrichten...</p>
             ) : ( messages.length > 0 ? (

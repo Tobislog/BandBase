@@ -29,7 +29,7 @@ export default function Messenger () {
                 button={<BasicButton title="Neuer Channel" icon={<MessageCirclePlus />} disabled={!canManage} />}
             >   
                 <div className="flex flex-row ">
-                    <div className={`flex flex-col flex-1 p-2 gap-2 bg-surface border-r border-line`}>
+                    <div className={`flex flex-col flex-1 p-2 gap-2 bg-surface border-r border-line max-h-117 overflow-auto`}>
                         {channels.map((channel) => (
                             <div 
                                 key={channel.id}
