@@ -6,6 +6,7 @@ import { toEventForm } from "../../utils/event";
 import { addHoursToTime, isOvernightEvent } from "../../utils/date";
 import { useChannels } from "../../context/ChannelProvider";
 import { useBand } from "../../context/BandProvider";
+import MessageWidget from "../messages/MessageWidget";
 
 export default function EventModal ({ event, onClose, onSave, onDelete}) {
     const { canManage } = useBand();
@@ -239,32 +240,7 @@ export default function EventModal ({ event, onClose, onSave, onDelete}) {
                         )}
                     </form>
                     {event?.channelId ? (
-                        <div>
-                            <h3 className="text-l font-semibold mb-3">Nachrichten</h3>
-                            <div className="flex flex-col gap-2 bg-surface-accent border border-line rounded p-2 mb-4 ">
-                            {messagesLoading && messages.length === 0 ? (
-                                <p className="text-sm text-copy/60">Lade Nachrichten...</p>
-                            ) : (
-                                messages.map((m) => (
-                                <ChatMessage key={m.id} message={m}/>
-                                ))
-                            )}
-                            </div>
-                            <div className="flex flex-row items-center justify-between">
-                                <input 
-                                    type="text" 
-                                    value={messageContent} 
-                                    onChange={handleInputChange}
-                                    placeholder="Nachricht schreiben..."
-                                    className="p-1 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
-                                />
-                                <BasicButton 
-                                    icon={<SendHorizonal />} 
-                                    onClick={handleSendMessage}
-                                    disabled={messagesLoading || !messageContent.trim()}
-                                />
-                            </div>
-                        </div>
+                        <MessageWidget onError={(msg) => setError(msg)}/>
                     ) : (
                         <p className="text-sm text-copy/60">
                             Nachrichten sind nach dem Speichern des Events verfügbar.
